@@ -1,0 +1,35 @@
+<h2>Behaviors</h2>
+        <ul>
+            <li>It has a GameService on the server which to creates and manages GameControllers</li>
+            <li>It has GameController objects
+                <ul>
+                    <li>...which keeps the Game object up to date</li>
+                    <li>...which notifies listeners of score updates</li>
+                </ul>
+            <li>It has Game objects that represent individual games
+                <ul>
+                    <li>...which belong to one Table</li>
+                    <li>...which may have one of several states:
+                        <ul>
+                            <li><b>Ready to Play</b> (game is created and ready to start)</li>
+                            <li><b>In Progress</b> (game is in progress)</li>
+                            <li><b>Canceled</b> (game will not be resumed)</li>
+                            <li><b>Ended</b> (game has been completed)</li>
+                        </ul>
+                    <li>...which may be saved in a "Suspended" state to be saved to persistent storage resumed later</li>
+                    <li>...which is associated with 2 Players or Teams</li>
+                    <li>...which track the points for each Player or Team</li>
+                </ul>
+            </li>
+            <li>It has Table objects that represent physical tables
+                <ul>
+                    <li>Which have one 
+            </li>
+            <li>It has a ScoreBoardService on the server which creates and manages ScoreBoard objects</li>
+            <li>It has a ScoreBoard objects
+                <ul>
+                    <li>...which maintain a persistent socket connection with a client</li>
+                    <li>...which subscribe to receive score updates from a GameController</li>
+                </ul>
+            </li>
+        </ul>

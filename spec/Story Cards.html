@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en>"
+    <head>
+        <title>PingPongr - Story Cards</title>
+        <link rel="stylesheet" type="text/css" href="resources/css/styles.css" />
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+        <script src="resources/javascript/page/story-cards.js" type="text/javascript"></script>
+    </head>
+    <body>
+        <h1>PingPongr - Story Cards</h1>
+        <hr />
+
+        <p><a href="Use Cases.html">
+            &laquo; Back to Use Cases
+        </a></p>
+
+        <div class="story-card" data-story-card="PPR-100">
+            <h3>PPR-100</h3>
+            <div class="story">
+                As a new player
+                I want to be able to register with my first name, last name, and a user name
+                so that I can participate in games</div>
+
+            <h3>Acceptance Criteria</h3>
+            <ol>
+                <li>On the login page (PPR-), there is a link to a registration page</li>
+                <li>The registration page has a form where new users may register with the following information:
+                    <ol>
+                        <li>First and Last name</li>
+                        <li>Nickname</li>
+                        <li>User name<br />Note 1: only match [a-zA-Z0-9_-\.]+</li>
+                        <li>Password</li>
+                        <li>Repeat password</li>
+                    </ol>
+                    Note 2: The form should have client-side validation to ensure the user's passwords match
+                </li>
+                <li>After a new user types a user name, the UI will update with the availability of the name</li>
+                <li>When the user submits the form, the server side verifys 
+            </ol>
+        </div>
+    </body>
+</html>
