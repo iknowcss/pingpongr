@@ -1,10 +1,18 @@
 {
-    "name": "PingPongr-test",
+    "name": "ping-pongr",
     "version": "0.0.1",
     "author": "iknowCSS <cody.jenkins@iknowcss.com>",
+    "contributors": [
+    	{
+    		"name": "Cody Jenkins",
+    		"email": "cody.jenkins@iknowcss.com"
+    	}
+    ],
     "dependencies": {
         "jasmine-node": "1.3.0",
         "underscore": "1.4.4",
-        "backbone": "0.9.10"
-    }
+        "express": "3.0"
+    },
+    "repository": "https://github.com/iknowcss/pingpongr",
+    "main": "index"
 }
