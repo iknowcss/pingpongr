@@ -1,42 +1,42 @@
-var game = require('../lib/game')
+var Game = require('../lib/game')
     _ = require('underscore'),
     
-    gameStatus = game.gameStatus;
+    gameStatus = Game.gameStatus;
 
 describe('A Game', function () {
-    var gameInstance;
+    var game;
 
     beforeEach(function () {
-        gameInstance = game();
+        game = Game();
     });
 
     it('is constructed in the "ready" state by default', function () {
-        expect(gameInstance.status()).toBe(gameStatus.READY);
+        expect(game.getStatus()).toBe(gameStatus.READY);
     });
 
     it('should change its status appropriately from game start to game end', function () {
-        expect(gameInstance.startGame()).toBeTruthy();
-        expect(gameInstance.status()).toBe(gameStatus.IN_PROGRESS);
-        expect(gameInstance.endGame()).toBeTruthy();
-        expect(gameInstance.status()).toBe(gameStatus.ENDED);
+        expect(game.startGame()).toBeTruthy();
+        expect(game.getStatus()).toBe(gameStatus.IN_PROGRESS);
+        expect(game.endGame()).toBeTruthy();
+        expect(game.getStatus()).toBe(gameStatus.ENDED);
     });
 
     it('should change its status appropriately from game start to game cancelled', function () {
-        expect(gameInstance.startGame()).toBeTruthy();
-        expect(gameInstance.status()).toBe(gameStatus.IN_PROGRESS);
-        expect(gameInstance.cancelGame()).toBeTruthy();
-        expect(gameInstance.status()).toBe(gameStatus.CANCELLED);
+        expect(game.startGame()).toBeTruthy();
+        expect(game.getStatus()).toBe(gameStatus.IN_PROGRESS);
+        expect(game.cancelGame()).toBeTruthy();
+        expect(game.getStatus()).toBe(gameStatus.CANCELLED);
     });
 
     it('should not start a game when "in-progress", "cancelled", or "ended"', function () {
-        gameInstance = game({ status: gameStatus.IN_PROGRESS });
-        expect(gameInstance.startGame()).toBeFalsy();
+        game = Game({ status: gameStatus.IN_PROGRESS });
+        expect(game.startGame()).toBeFalsy();
         
-        gameInstance = game({ status: gameStatus.CANCELLED });
-        expect(gameInstance.startGame()).toBeFalsy();
+        game = Game({ status: gameStatus.CANCELLED });
+        expect(game.startGame()).toBeFalsy();
         
-        gameInstance = game({ status: gameStatus.ENDED });
-        expect(gameInstance.startGame()).toBeFalsy();
+        game = Game({ status: gameStatus.ENDED });
+        expect(game.startGame()).toBeFalsy();
     });
 
 });
