@@ -50,7 +50,7 @@ describe('A Game', function () {
     it('should not validate when invalid players are set', function () {
         var nonArray = {},
             invalidArray = ['Lone player'],
-            invalidPlayers = [{}, {}];
+            invalidPlayerType = [{}, {}];
 
         game = Game({ players: nonArray });
         expect(game.validate().valid).toBeFalsy();
@@ -58,7 +58,7 @@ describe('A Game', function () {
         game = Game({ players: invalidArray });
         expect(game.validate().valid).toBeFalsy();
 
-        game = Game({ players: invalidPlayers });
+        game = Game({ players: invalidPlayerType });
         expect(game.validate().valid).toBeFalsy();
     });
 
