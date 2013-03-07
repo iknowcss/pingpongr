@@ -8,11 +8,6 @@ describe('A Game', function () {
         game = Game();
     });
 
-    it('is constructed with the proper defaults', function () {
-        expect(game.getStatus()).toBe(Game.status.READY);
-        expect(game.getPlayers()).toEqual(['Player 1', 'Player 2']);
-    });
-
     it('should return an independent, cloned players array', function () {
         var players = game.getPlayers();
         players[0] = 'Player X';
@@ -21,16 +16,18 @@ describe('A Game', function () {
     });
 
     it('should change its status appropriately from game start to game end', function () {
-        expect(game.startGame()).toBeTruthy();
+        game.startGame();
         expect(game.getStatus()).toBe(Game.status.IN_PROGRESS);
-        expect(game.endGame()).toBeTruthy();
+
+        game.endGame();
         expect(game.getStatus()).toBe(Game.status.ENDED);
     });
 
     it('should change its status appropriately from game start to game cancelled', function () {
-        expect(game.startGame()).toBeTruthy();
+        game.startGame();
         expect(game.getStatus()).toBe(Game.status.IN_PROGRESS);
-        expect(game.cancelGame()).toBeTruthy();
+        
+        game.cancelGame();
         expect(game.getStatus()).toBe(Game.status.CANCELLED);
     });
 
@@ -50,27 +47,19 @@ describe('A Game', function () {
         expectNoStatusChange(Game.status.ENDED, "endGame");
     });
 
-    it('should allow players to be set', function () {
-        var newPlayers = ['Alice', 'Bob'];
-        expect(game.setPlayers(newPlayers)).toBeTruthy();
-        expect(game.getPlayers()).toEqual(newPlayers);
-    });
-
-    it('should not allow invalid players to be set', function () {
+    it('should not validate when invalid players are set', function () {
         var nonArray = {},
             invalidArray = ['Lone player'],
             invalidPlayers = [{}, {}];
-        expect(game.setPlayers(nonArray)).toBeFalsy();
-        expect(game.setPlayers(invalidArray)).toBeFalsy();
-        expect(game.setPlayers(invalidPlayers)).toBeFalsy();
-        expect(game.getPlayers()).toEqual(Game.defaults.players);
-    });
 
-    it('should not allow players to be set when game is not in "ready" state', function () {
-        var newPlayers = ['Alice', 'Bob'];
-        game.startGame();
-        expect(game.setPlayers(newPlayers)).toBeFalsy();
-        expect(game.getPlayers()).toEqual(Game.defaults.players);
+        game = Game({ players: nonArray });
+        expect(game.validate().valid).toBeFalsy();
+
+        game = Game({ players: invalidArray });
+        expect(game.validate().valid).toBeFalsy();
+
+        game = Game({ players: invalidPlayers });
+        expect(game.validate().valid).toBeFalsy();
     });
 
     it('should generate an up-to-date JSON', function () {
@@ -84,7 +73,7 @@ describe('A Game', function () {
 
     function expectNoStatusChange (initialStatus, action) {
         game = Game({ status: initialStatus });
-        expect(game[action]()).toBeFalsy();
+        game[action].call();
         expect(game.getStatus()).toBe(initialStatus);
     }
 
