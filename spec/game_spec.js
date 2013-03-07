@@ -29,14 +29,25 @@ describe('A Game', function () {
     });
 
     it('should not start a game when "in-progress", "cancelled", or "ended"', function () {
-        game = Game({ status: gameStatus.IN_PROGRESS });
-        expect(game.startGame()).toBeFalsy();
-        
-        game = Game({ status: gameStatus.CANCELLED });
-        expect(game.startGame()).toBeFalsy();
-        
-        game = Game({ status: gameStatus.ENDED });
-        expect(game.startGame()).toBeFalsy();
+        expectNoStatusChange(gameStatus.IN_PROGRESS, "startGame");
+        expectNoStatusChange(gameStatus.CANCELLED, "startGame");
+        expectNoStatusChange(gameStatus.ENDED, "startGame");
     });
+
+    it('should not cancel or end a game when "ready", "cancelled", or "ended"', function () {
+        expectNoStatusChange(gameStatus.READY, "cancelGame");
+        expectNoStatusChange(gameStatus.CANCELLED, "cancelGame");
+        expectNoStatusChange(gameStatus.ENDED, "cancelGame");
+
+        expectNoStatusChange(gameStatus.READY, "endGame");
+        expectNoStatusChange(gameStatus.CANCELLED, "endGame");
+        expectNoStatusChange(gameStatus.ENDED, "endGame");
+    });
+
+    function expectNoStatusChange (initialStatus, action) {
+        game = Game({ status: initialStatus });
+        expect(game[action]()).toBeFalsy();
+        expect(game.getStatus()).toBe(initialStatus);
+    }
 
 });
