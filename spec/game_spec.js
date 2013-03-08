@@ -1,18 +1,12 @@
 var Game = require('../lib/game'),
+    PlayerSet = require('../lib/player-set'),
     _ = require('underscore');
 
 describe('A Game', function () {
     var game;
 
     beforeEach(function () {
-        game = Game();
-    });
-
-    it('should return an independent, cloned players array', function () {
-        var players = game.getPlayers();
-        players[0] = 'Player X';
-
-        expect(game.getPlayers()).not.toEqual(players);
+        game = new Game();
     });
 
     it('should change its status appropriately from game start to game end', function () {
@@ -47,32 +41,34 @@ describe('A Game', function () {
         expectNoStatusChange(Game.status.ENDED, "endGame");
     });
 
-    it('should not validate when invalid players are set', function () {
-        var nonArray = {},
-            invalidArray = ['Lone player'],
-            invalidPlayerType = [{}, {}];
+    it('should not validate when an invalid playerSet is set', function () {
+        var nonPlayerSet = {},
+            invalidPlayerSet = new PlayerSet('Lone player'),
+            validPlayerSet = new PlayerSet('Player X', 'Player Y');
 
-        game = Game({ players: nonArray });
-        expect(game.validate().valid).toBeFalsy();
+        game = new Game({ playerSet: nonPlayerSet })
+        expect(game.validate().isValid()).toBe(false);
 
-        game = Game({ players: invalidArray });
-        expect(game.validate().valid).toBeFalsy();
-
-        game = Game({ players: invalidPlayerType });
-        expect(game.validate().valid).toBeFalsy();
+        game = new Game({ playerSet: invalidPlayerSet })
+        expect(game.validate().isValid()).toBe(false);
+        
+        game = new Game({ playerSet: validPlayerSet })
+        expect(game.validate().isValid()).toBe(true);
     });
 
     it('should generate an up-to-date JSON', function () {
         var expectedJson = {
-            status: Game.status.IN_PROGRESS,
-            players: ['Player 1', 'Player 2']
-        };
+                status: Game.status.IN_PROGRESS,
+                playerSet: {
+                    players: ['Player 1', 'Player 2']
+                }
+            };
         game.startGame();
         expect(game.toJSON()).toEqual(expectedJson);
     });
 
     function expectNoStatusChange (initialStatus, action) {
-        game = Game({ status: initialStatus });
+        game = new Game({ status: initialStatus });
         game[action].call();
         expect(game.getStatus()).toBe(initialStatus);
     }

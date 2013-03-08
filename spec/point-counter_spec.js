@@ -1,23 +1,29 @@
-var _ = require('underscore'),
-    PointCounter = require('../lib/point-counter');
+var PointCounter = require('../lib/point-counter'),
+    PlayerSet = require('../lib/player-set'),
+    _ = require('underscore');
 
 describe('A PointCounter', function () {
 
-    var pointCounter,
-        players = ['Player 1', 'Player 2'];
+    var pointCounter;
 
     beforeEach(function () {
-        pointCounter = PointCounter({
-            players: players
+        pointCounter = new PointCounter({
+            players: new PlayerSet('Player 1', 'Player 2')
         });
     });
 
-    it('should not initialize without players', function () {
-        var pointCounter,
-            badInit = function () {
-                pointCounter = PointCounter();
+    it('should not initialize without valid players', function () {
+        var badInitType = function () {
+                new PointCounter();
+            },
+            badInitInvalid = function () {
+                new PointCounter({
+                    players: new PlayerSet('Lonely Player')
+                });
             };
-        expect(badInit).toThrow();
+
+        expect(badInitType).toThrow();
+        expect(badInitInvalid).toThrow();
     })
 
     it('should initalize with the proper defaults', function () {
