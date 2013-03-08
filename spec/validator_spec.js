@@ -3,83 +3,115 @@ var Validator = require('../lib/validator'),
 
 describe('A Validator', function () {
 
-    var validator,
-        collectionValidationFunctions = {
-            stringStartsWithA: function (str, validator) {
-                if (str[0] != 'a') {
-                    validator.error('String should start with "a"');
-                }
-            },
-            stringStartsWithB: function (str, validator) {
-                if (str[1] != 'b') {
-                    validator.error('String should start with "b"').stop();
-                }
-            },
-            stringStartsWithC: function (str, validator) {
-                if (str[2] != 'c') {
-                    validator.error('String should start with "c"');
-                }
-            }
-        },
-        arrayValidationFunctions = [
-            function (str, validator) {
-                if (str[0] != 'x') {
-                    validator.error('String should start with "x"');
-                }
-            },
-            function (str, validator) {
-                if (str[1] != 'y') {
-                    validator.error('String should start with "y"').stop();
-                }
-            },
-            function (str, validator) {
-                if (str[2] != 'z') {
-                    validator.error('String should start with "z"');
-                }
-            }
+    var validator;
+
+    /* Validation functions */
+    function firstLetterIsA (str, validator) {
+        if (str[0] != 'a') {
+            validator.error('1st letter should be "a"');
+        }
+    }
+
+    function secondLetterIsB (str, validator) {
+        if (str[1] != 'b') {
+            validator.error('2nd letter should be "b"').stop();
+        }
+    }
+
+    function thirdLetterIsC (str, validator) {
+        if (str[2] != 'c') {
+            validator.error('3rd letter should be "c"');
+        }
+    }
+
+    function fourthLetterIsD (str, validator) {
+        if (str[3] != 'd') {
+            validator.error('4th letter should be "d"');
+        }
+    }
+
+    function fifthLetterIsE (str, validator) {
+        if (str[4] != 'e') {
+            validator.error('5th letter should be "e"');
+        }
+    }
+
+    function firstLetterIsX (str, validator) {
+        if (str[0] != 'x') {
+            validator.error('1st letter should be "x"');
+        }
+    }
+
+    function secondLetterIsY (str, validator) {
+        if (str[1] != 'y') {
+            validator.error('2nd letter should be "y"').stop();
+        }
+    }
+
+    function thirdLetterIsZ (str, validator) {
+        if (str[2] != 'z') {
+            validator.error('3rd letter should be "z"');
+        }
+    }
+
+    /* Tests */
+    beforeEach(function () {
+        validator = new Validator(firstLetterIsA, secondLetterIsB, thirdLetterIsC);
+    });
+
+    it('should validate with an array or collection of validation functions', function () {
+        var validator,
+            expectedErrors,
+            validation;
+
+        // Array
+        validator = new Validator([
+            firstLetterIsX,
+            secondLetterIsY,
+            thirdLetterIsZ
+        ]);
+        expectedErrors = [ 
+            '1st letter should be "x"',
+            '3rd letter should be "z"'
+        ];
+        validation = validator.validate('ayc');
+
+        expect(validation.valid).toBe(false);
+        expect(validation.errors).toEqual(expectedErrors);
+
+        // Collection
+        validator = new Validator({
+            firstLetterIsA: firstLetterIsA,
+            secondLetterIsB: secondLetterIsB,
+            thirdLetterIsC: thirdLetterIsC
+        });
+        expectedErrors = [ 
+            '1st letter should be "a"',
+            '3rd letter should be "c"'
+        ];
+        validation = validator.validate('xbz');
+
+        expect(validation.valid).toBe(false);
+        expect(validation.errors).toEqual(expectedErrors);
+    });
+
+    it('should accept other Validator objects as subvalidators', function () {
+        var testString,
+            expectedErrors,
+            dValidator,
+            finalValidator,
+            validation;
+
+        testString = 'xbcwv';
+        expectedErrors = [
+            '1st letter should be "a"',
+            '4th letter should be "d"',
+            '5th letter should be "e"'
         ];
 
-    beforeEach(function () {
-        validator = new Validator(collectionValidationFunctions);
-    });
-
-    it('should validate with a collection of validation functions', function () {
-        var validator = new Validator(collectionValidationFunctions),
-            expectedErrors = [ 
-                'String should start with "a"',
-                'String should start with "c"'
-            ],
-            validation = validator.validate('xbz');
-
-        expect(validation.valid).toBe(false);
-        expect(validation.errors).toEqual(expectedErrors);
-    });
-
-    it('should validate with an array of validation functions', function () {
-        var validator = new Validator(arrayValidationFunctions),
-            expectedErrors = [ 
-                'String should start with "x"',
-                'String should start with "z"'
-            ],
-            validation = validator.validate('ayc');
-
-        expect(validation.valid).toBe(false);
-        expect(validation.errors).toEqual(expectedErrors);
-    });
-
-    it('should accept other Validators as subvalidators', function () {
-        var regularValidationFunction = function (str, validator) {
-                if (str[3] != 'd') {
-                    validator.error('String should end with "d"');
-                }
-            },
-            testString = 'xbcw',
-            expectedErrors = [
-                'String should start with "a"',
-                'String should end with "d"'
-            ],
-            superValidator = new Validator(validator, regularValidationFunction),
-            validation = superValidator.validate(testString);
+        dValidator = new Validator(validator, fourthLetterIsD);
+        finalValidator = new Validator(dValidator, fifthLetterIsE);
+        validation = finalValidator.validate(testString);
 
         expect(validation.valid).toBe(false);
         expect(validation.errors).toEqual(expectedErrors);
@@ -87,7 +119,7 @@ describe('A Validator', function () {
 
     it('should stop validating an object when specified', function () {
         var expectedErrors = [ 
-                'String should start with "b"'
+                '2nd letter should be "b"'
             ],
             validation = validator.validate('ayc');
 
