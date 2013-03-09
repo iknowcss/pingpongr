@@ -42,18 +42,32 @@ describe('A Game', function () {
     });
 
     it('should not validate when an invalid playerSet is set', function () {
-        var nonPlayerSet = {},
-            invalidPlayerSet = new PlayerSet('Lone player'),
+        var validation,
+            nonPlayerSet = {},
+            incompletePlayerSet = new PlayerSet('Lone player'),
+            invalidPlayerSet = new PlayerSet(4.3, 5),
             validPlayerSet = new PlayerSet('Player X', 'Player Y');
 
-        game = new Game({ playerSet: nonPlayerSet })
-        expect(game.validate().isValid()).toBe(false);
+        game = new Game({ playerSet: nonPlayerSet });
+        validation = game.validate();
+        expect(validation.valid).toBe(false);
+        expect(validation.errors.length).toBe(1);
 
-        game = new Game({ playerSet: invalidPlayerSet })
-        expect(game.validate().isValid()).toBe(false);
+        game = new Game({ playerSet: incompletePlayerSet });
+        validation = game.validate();
+        expect(validation.valid).toBe(false);
+        expect(validation.errors.length).toBe(1);
+
+        game = new Game({ playerSet: invalidPlayerSet });
+        validation = game.validate();
+        expect(validation.valid).toBe(false);
+        expect(validation.errors.length).toBe(2);
         
-        game = new Game({ playerSet: validPlayerSet })
-        expect(game.validate().isValid()).toBe(true);
+        game = new Game({ playerSet: validPlayerSet });
+        validation = game.validate();
+        expect(validation.valid).toBe(true);
+        expect(validation.errors.length).toBe(0);
+
     });
 
     it('should generate an up-to-date JSON', function () {

@@ -1,4 +1,5 @@
 var PlayerSet = require('../lib/player-set'),
+    Validator = require('../lib/validator'),
     _ = require('underscore');
 
 describe('A PlayerSet', function () {
@@ -24,22 +25,41 @@ describe('A PlayerSet', function () {
     });
 
     it('should not validate when there are not two players', function () {
+        var validation;
+
         playerSet = new PlayerSet();
-        expect(playerSet.validate().isValid()).toBe(false);
+        validation = playerSet.validate();
+        expect(validation.valid).toBe(false);
+        expect(validation.errors.length).toBe(1);
 
         playerSet = new PlayerSet('Lonely Player');
-        expect(playerSet.validate().isValid()).toBe(false);
+        validation = playerSet.validate();
+        expect(validation.valid).toBe(false);
+        expect(validation.errors.length).toBe(1);
 
         playerSet = new PlayerSet('Player P', 'Player Q');
-        expect(playerSet.validate().isValid()).toBe(true);
+        validation = playerSet.validate();
+        expect(validation.valid).toBe(true);
+        expect(validation.errors.length).toBe(0);
     });
 
     it('should not validate either of the players is of the wrong type', function () {
+        var validation;
+
         playerSet = new PlayerSet('Player X', 3);
-        expect(playerSet.validate().isValid()).toBe(false);
+        validation = playerSet.validate();
+        expect(validation.valid).toBe(false);
+        expect(validation.errors.length).toBe(1);
 
         playerSet = new PlayerSet(4.2, 'Player Y');
-        expect(playerSet.validate().isValid()).toBe(false);
+        validation = playerSet.validate();
+        expect(validation.valid).toBe(false);
+        expect(validation.errors.length).toBe(1);
+
+        playerSet = new PlayerSet({}, []);
+        validation = playerSet.validate();
+        expect(validation.valid).toBe(false);
+        expect(validation.errors.length).toBe(2);
     });
 
     it('should generate an up-to-date JSON', function () {
