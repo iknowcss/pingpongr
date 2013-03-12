@@ -51,13 +51,61 @@ describe('A PointCounter', function () {
     });
 
     it('should allow points to be added to the "left" or "right"', function () {
-        pointCounter.pointLeft();
-        pointCounter.pointRight();
-        pointCounter.pointLeft();
-        pointCounter.pointLeft();
-        pointCounter.pointRight();
+        var score;
+
+        score = pointCounter.pointLeft();
+        expect(score).toEqual([1, 0]);
+        score = pointCounter.pointRight();
+        expect(score).toEqual([1, 1]);
+        score = pointCounter.pointLeft();
+        expect(score).toEqual([2, 1]);
+        score = pointCounter.pointLeft();
+        expect(score).toEqual([3, 1]);
+        score = pointCounter.pointRight();
+        expect(score).toEqual([3, 2]);
 
         expect(pointCounter.getScore()).toEqual([3, 2]);
+    });
+
+    it('should allow points to be undone and redone', function () {
+        var score;
+
+        // Undo points
+        pointCounter.pointLeft();          // 1 to 0
+        pointCounter.pointRight();         // 1 to 1
+        score = pointCounter.undoPoint();  // 1 to 0
+        expect(score).toEqual([1, 0]);
+        score = pointCounter.undoPoint();  // 0 to 0
+        expect(score).toEqual([0, 0]);
+        score = pointCounter.undoPoint();  // 0 to 0 (still)
+        expect(score).toEqual([0, 0]);
+
+        // Continue after undoing "too far"
+        score = pointCounter.pointRight(); // 0 to 1
+        expect(score).toEqual([0, 1]);
+
+        // Prepare a state and then undo thrice
+        pointCounter.pointRight(); // 0 to 2
+        pointCounter.pointLeft();  // 1 to 2
+        pointCounter.pointLeft();  // 2 to 2
+        pointCounter.pointRight(); // 2 to 3 *
+        pointCounter.undoPoint();  // 2 to 2
+        pointCounter.undoPoint();  // 1 to 2
+        pointCounter.undoPoint();  // 0 to 2
+
+        // Test redo
+        score = pointCounter.redoPoint(); // 1 to 2
+        expect(score).toEqual([1, 2]);
+        score = pointCounter.redoPoint(); // 2 to 2
+        expect(score).toEqual([2, 2]);
+
+        // Overwrite the 3rd point
+        score = pointCounter.pointLeft(); // 3 to 2
+        expect(score).toEqual([3, 2]);
+
+        // Redo past current score
+        score = pointCounter.redoPoint(); // 3 to 2 (still)
+        expect(score).toEqual([3, 2]);
     });
 
 });
