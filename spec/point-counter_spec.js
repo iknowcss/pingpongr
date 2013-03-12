@@ -108,4 +108,30 @@ describe('A PointCounter', function () {
         expect(score).toEqual([3, 2]);
     });
 
+    it('should generate an up-to-date JSON', function () {
+        var initialPointsJSON = {
+                score: [0, 0]
+            },
+            leftPointsJSON = {
+                score: [1, 0]
+            },
+            bothPointsJSON = {
+                score: [1, 1]
+            },
+            undoneJSON = {
+                score: [1, 0]
+            };
+
+        expect(pointCounter.toJSON()).toEqual(initialPointsJSON);
+
+        pointCounter.pointLeft();
+        expect(pointCounter.toJSON()).toEqual(leftPointsJSON);
+
+        pointCounter.pointRight();
+        expect(pointCounter.toJSON()).toEqual(bothPointsJSON);
+
+        pointCounter.undoPoint();
+        expect(pointCounter.toJSON()).toEqual(undoneJSON);
+    });
+
 });
