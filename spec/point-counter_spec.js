@@ -148,10 +148,10 @@ describe('A PointCounter', function () {
 
     it('should generate an up-to-date JSON', function () {
         var pointCounter = PointCounter(),
-            initialPointsJSON = [0, 0],
-            leftPointsJSON = [1, 0],
-            bothPointsJSON = [1, 1],
-            undoneJSON = [1, 0];
+            initialPointsJSON = { score: [0, 0] },
+            leftPointsJSON = { score: [1, 0] },
+            bothPointsJSON = { score: [1, 1] },
+            undoneJSON = { score: [1, 0] };
 
         expect(pointCounter.toJSON()).toEqual(initialPointsJSON);
 
