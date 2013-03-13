@@ -1,35 +1,63 @@
 var GameState = require('../lib/game-state'),
     _ = require('underscore');
 
-function expectNoStatusChange (initialState, action) {
-    var success;
-    gameState = new GameState(initialState);
-    success = gameState[action].call();
-    expect(success).toBe(false);
-    expect(gameState.getState()).toBe(initialState);
-}
-
 describe('A GameState', function () {
-    var gameState;
 
-    beforeEach(function () {
-        gameState = new GameState();
+    var globalGameState;
+
+    function doConstructWith (initArg) {
+        return function () {
+            if (!_.isUndefined(initArg)) {
+                globalGameState = GameState(initArg);
+            } else {
+                globalGameState = GameState();
+            }
+        };
+    }
+
+    function expectNoStatusChange (initialState, action) {
+        var gameState = GameState(initialState),
+            success;
+
+        success = gameState[action].call();
+        expect(success).toBe(false);
+        expect(gameState.getState()).toBe(initialState);
+    }
+
+    it('should initialize with defaults', function () {
+        expect(doConstructWith()).not.toThrow();
+        expect(globalGameState instanceof GameState).toBe(true);
+        expect(globalGameState.getState()).toBe(GameState.READY);
     });
 
-    it('should initialize with valid defaults', function () {
-        var validation = gameState.validate();
-        expect(validation.valid).toBe(true);
+    it('should initialize with a game state as the constructor argument', function () {
+        var validState = GameState.CANCELLED;
+
+        expect(doConstructWith(validState)).not.toThrow();
+        expect(globalGameState instanceof GameState).toBe(true);
+        expect(globalGameState.getState()).toBe(validState);
     });
 
-    it('should initialize with either a string or a collection', function () {
-        gameState = new GameState(GameState.IN_PROGRESS);
-        expect(gameState.getState()).toBe(GameState.IN_PROGRESS);
+    it('should initialize an independent instance with a GameState as the constructor argument', function () {
+        var initialState = GameState.IN_PROGRESS,
+            otherGameState = GameState(initialState);
 
-        gameState = new GameState({ state: GameState.CANCELLED });
-        expect(gameState.getState()).toBe(GameState.CANCELLED);
+        expect(doConstructWith(otherGameState)).not.toThrow();
+        expect(globalGameState instanceof GameState).toBe(true);
+        expect(globalGameState.getState()).toBe(initialState);
+
+        otherGameState.endGame();
+        expect(otherGameState.getState()).toBe(GameState.ENDED);
+        expect(globalGameState.getState()).toBe(initialState);
+    });
+
+    it('should not initialize with a bad state', function () {
+        expect(doConstructWith('badState')).toThrow();
     });
 
     it('should change state appropriately from game start to game end', function () {
+        var gameState = GameState();
+
         gameState.startGame();
         expect(gameState.getState()).toBe(GameState.IN_PROGRESS);
 
@@ -38,6 +66,8 @@ describe('A GameState', function () {
     });
 
     it('should change state appropriately from game start to game cancelled', function () {
+        var gameState = GameState();
+
         gameState.startGame();
         expect(gameState.getState()).toBe(GameState.IN_PROGRESS);
         
@@ -61,23 +91,10 @@ describe('A GameState', function () {
         expectNoStatusChange(GameState.ENDED, "endGame");
     });
 
-    it('should not validate when initialized with an invalid state', function () {
-        var gameState,
-            validation;
-
-        gameState = new GameState({ state: 'foo' });
-        validation = gameState.validate();
-        expect(validation.valid).toBe(false);
-        expect(validation.errors.length).toBe(1);
-
-        gameState = new GameState('bar');
-        validation = gameState.validate();
-        expect(validation.valid).toBe(false);
-        expect(validation.errors.length).toBe(1);
-    });
-
     it('should generate an up-to-date JSON', function () {
-        var gameState = new GameState();
+        var gameState;
+        
+        gameState = GameState();
         expect(gameState.toJSON()).toEqual({ state: GameState.READY });
 
         gameState.startGame();
@@ -86,7 +103,7 @@ describe('A GameState', function () {
         gameState.cancelGame();
         expect(gameState.toJSON()).toEqual({ state: GameState.CANCELLED });
 
-        gameState = new GameState();
+        gameState = GameState();
         gameState.startGame();
         gameState.endGame();
         expect(gameState.toJSON()).toEqual({ state: GameState.ENDED });

@@ -27,7 +27,7 @@ describe('A PointCounter', function () {
 
         expect(doConstructWith(validScore)).not.toThrow();
         expect(globalPointCounter instanceof PointCounter).toBe(true);
-        expect(globalPointCounter.getScore()).toEqual([5, 1]);
+        expect(globalPointCounter.getScore()).toEqual(validScore);
     });
 
     it('should initialize an independent instance with a PointCounter as the constructor argument', function () {
