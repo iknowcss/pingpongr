@@ -10,6 +10,11 @@ describe('A PointCounter', function () {
         pointCounter = new PointCounter();
     });
 
+    it('should initialize with defaults', function () {
+        var validation = pointCounter.validate();
+        expect(validation.valid).toBe(true);
+    });
+
     it('should return an independent, cloned score array', function () {
         var score = pointCounter.getScore();
         score[0] = 9001;
@@ -17,12 +22,17 @@ describe('A PointCounter', function () {
     });
 
     it('should not validate with invalid initial score', function () {
-        var wrongType = {},
+        var wrongType = 1,
             wrongSize = [1],
             wrongElementType = [1.2, 1.4],
             invalidElementValue = [-1, -2],
             validPoints = [0, 5],
             validation;
+
+        pointCounter = new PointCounter(wrongType);
+        validation = pointCounter.validate();
+        expect(validation.valid).toBe(false);
+        expect(validation.errors.length).toBe(1);
 
         pointCounter = new PointCounter({ initialScore: wrongType });
         validation = pointCounter.validate();

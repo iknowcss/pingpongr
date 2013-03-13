@@ -1,12 +1,12 @@
 var GameState = require('../lib/game-state'),
     _ = require('underscore');
 
-function expectNoStatusChange (initialStatus, action) {
+function expectNoStatusChange (initialState, action) {
     var success;
-    gameState = new GameState({ state: initialStatus });
+    gameState = new GameState(initialState);
     success = gameState[action].call();
     expect(success).toBe(false);
-    expect(gameState.getState()).toBe(initialStatus);
+    expect(gameState.getState()).toBe(initialState);
 }
 
 describe('A GameState', function () {
@@ -14,6 +14,19 @@ describe('A GameState', function () {
 
     beforeEach(function () {
         gameState = new GameState();
+    });
+
+    it('should initialize with valid defaults', function () {
+        var validation = gameState.validate();
+        expect(validation.valid).toBe(true);
+    });
+
+    it('should initialize with either a string or a collection', function () {
+        gameState = new GameState(GameState.IN_PROGRESS);
+        expect(gameState.getState()).toBe(GameState.IN_PROGRESS);
+
+        gameState = new GameState({ state: GameState.CANCELLED });
+        expect(gameState.getState()).toBe(GameState.CANCELLED);
     });
 
     it('should change state appropriately from game start to game end', function () {
@@ -52,12 +65,12 @@ describe('A GameState', function () {
         var gameState,
             validation;
 
-        gameState = new GameState({ state: {} });
+        gameState = new GameState({ state: 'foo' });
         validation = gameState.validate();
         expect(validation.valid).toBe(false);
         expect(validation.errors.length).toBe(1);
 
-        gameState = new GameState({ state: 'foo' });
+        gameState = new GameState('bar');
         validation = gameState.validate();
         expect(validation.valid).toBe(false);
         expect(validation.errors.length).toBe(1);
