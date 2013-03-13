@@ -8,11 +8,7 @@ describe('A PointCounter', function () {
 
     function doConstructWith (initArg) {
         return function () {
-            if (!_.isUndefined(initArg)) {
-                globalPointCounter = PointCounter(initArg);
-            } else {
-                globalPointCounter = PointCounter();
-            }
+            globalPointCounter = PointCounter(initArg);
         };
     }
 

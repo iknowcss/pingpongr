@@ -7,11 +7,7 @@ describe('A GameState', function () {
 
     function doConstructWith (initArg) {
         return function () {
-            if (!_.isUndefined(initArg)) {
-                globalGameState = GameState(initArg);
-            } else {
-                globalGameState = GameState();
-            }
+            globalGameState = GameState(initArg);
         };
     }
 
