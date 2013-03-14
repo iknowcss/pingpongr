@@ -3,20 +3,39 @@ var Game = require('../lib/game'),
     PlayerSet = require('../lib/player-set'),
     PointCounter = require('../lib/point-counter');
 
-describe('A GameState', function () {
+describe('A Game', function () {
     
-    var game;
+    var globalGame;
 
-    beforeEach(function () {
-        game = new Game();
+    function doConstructWith (initArg) {
+        return function () {
+            globalGame = Game(initArg);
+        };
+    }
+
+    it('should initialize with defaults', function () {
+        var expectedJSON = {
+                state: GameState.READY,
+                score: [0, 0],
+                players: ['Player 1', 'Player 2']
+            };
+
+        expect(doConstructWith()).not.toThrow();
+        expect(globalGame instanceof Game).toBe(true);
+        expect(globalGame.toJSON()).toEqual(expectedJSON);
     });
 
-    it('should initialize with valid defaults', function () {
-        var validation = game.validate();
-        expect(validation.valid).toBe(true);
+    it('should initialize with provided options', function () {
+        var providedState = { state: GameState.IN_PROGRESS },
+            providedScore = { score: [5, 0] },
+            providedPlayers = { players: ['Player X', 'Player Y'];
+
+        expect(doConstructWith()).not.toThrow();
+        expect(globalGame instanceof Game).toBe(true);
+        expect(globalGame.toJSON()).toEqual(expectedJSON);
     });
 
-    it('should validate with valid provided components', function () {
+    xit('should validate with valid provided components', function () {
         var validGameState = new GameState(GameState.IN_PROGRESS),
             validPlayerSet = new PlayerSet(['Molly', 'Tracy']),
             validPointCounter = new PointCounter([5, 0]),
@@ -38,7 +57,7 @@ describe('A GameState', function () {
         expect(validation.valid).toBe(true);
     });
 
-    it('should not validate with invalid provided components', function () {
+    xit('should not validate with invalid provided components', function () {
         var invalidGameState = new GameState('foo'),
             invalidPlayerSet = new PlayerSet(['Daisy']),
             invalidPointCounter = new PointCounter([-2, 0]),

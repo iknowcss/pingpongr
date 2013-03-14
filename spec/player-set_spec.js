@@ -37,60 +37,73 @@ describe('A PlayerSet', function () {
         // TODO: test independence when possible
     });
 
-    // it('should return an independent, cloned copy of the players array', function () {
-    //     var players;
+    it('should not initialize with a bad constructor argument', function () {
+        var wrongType = {},
+            tooFewPlayers = ['Lonely player'],
+            invalidButNotBad = ['', 'Other player'];
 
-    //     playerSet = new PlayerSet(['Player A', 'Player B']);        
-    //     players = playerSet.getPlayers();
-    //     players[0] = 'foo';
+        expect(doConstructWith(wrongType)).toThrow();
+        expect(doConstructWith(tooFewPlayers)).toThrow();
+        expect(doConstructWith(invalidButNotBad)).not.toThrow();
+    });
 
-    //     expect(playerSet.getPlayers()).not.toEqual(players);
-    // });
+    it('should not initialize if either of the players is of the wrong type', function () {
+        var wrongLeftPlayer = [new Object('One player'), 'Two player'],
+            wrongRightPlayer = ['Red player', new Object('Blue player')];
 
-    // it('should not validate when there are not two players', function () {
-    //     var validation;
+        expect(doConstructWith(wrongLeftPlayer)).toThrow();
+        expect(doConstructWith(wrongRightPlayer)).toThrow();
+    });
 
-    //     playerSet = new PlayerSet([]);
-    //     validation = playerSet.validate();
-    //     expect(validation.valid).toBe(false);
-    //     expect(validation.errors.length).toBe(1);
+    it('should return an independent, cloned copy of the players array', function () {
+        var expectedPlayers = ['Player A', 'Player B'],
+            playerSet = PlayerSet(expectedPlayers),
+            players = playerSet.getPlayers();
 
-    //     playerSet = new PlayerSet(['Lonely Player']);
-    //     validation = playerSet.validate();
-    //     expect(validation.valid).toBe(false);
-    //     expect(validation.errors.length).toBe(1);
+        players[0] = 'foo';
+        expect(playerSet.getPlayers()).toEqual(expectedPlayers);
+    });
 
-    //     playerSet = new PlayerSet(['Player P', 'Player Q']);
-    //     validation = playerSet.validate();
-    //     expect(validation.valid).toBe(true);
-    //     expect(validation.errors.length).toBe(0);
-    // });
+    it('should not validate if the player name lengths are invalid', function () {
+        var tooShort = '',
+            tooLong = 'Jose de Espinosa Dominguez',  // Greater than 25 characters
+            justRight = 'Germano del Los Hernandez', // Exactly 25 characters
+            longLeftPlayer = PlayerSet([ tooLong, justRight ]),
+            longRightPlayer = PlayerSet([ justRight, tooLong ]),
+            shortLeftPlayer = PlayerSet([ tooShort, justRight ]),
+            shortRightPlayer = PlayerSet([ justRight, tooShort ]),
+            bothWrong = PlayerSet([ tooLong, tooShort ]),
+            validation;
 
-    // it('should not validate either of the players is of the wrong type', function () {
-    //     var validation;
+        validation = longLeftPlayer.validate();
+        expect(validation.valid).toBe(false);
+        expect(validation.errors.length).toBe(1);
 
-    //     playerSet = new PlayerSet(['Player X', 3]);
-    //     validation = playerSet.validate();
-    //     expect(validation.valid).toBe(false);
-    //     expect(validation.errors.length).toBe(1);
+        validation = longRightPlayer.validate();
+        expect(validation.valid).toBe(false);
+        expect(validation.errors.length).toBe(1);
 
-    //     playerSet = new PlayerSet([4.2, 'Player Y']);
-    //     validation = playerSet.validate();
-    //     expect(validation.valid).toBe(false);
-    //     expect(validation.errors.length).toBe(1);
+        validation = shortLeftPlayer.validate();
+        expect(validation.valid).toBe(false);
+        expect(validation.errors.length).toBe(1);
 
-    //     playerSet = new PlayerSet([{}, []]);
-    //     validation = playerSet.validate();
-    //     expect(validation.valid).toBe(false);
-    //     expect(validation.errors.length).toBe(2);
-    // });
+        validation = shortRightPlayer.validate();
+        expect(validation.valid).toBe(false);
+        expect(validation.errors.length).toBe(1);
 
-    // it('should generate an up-to-date JSON', function () {
-    //     var playerSet = new PlayerSet(['Player G', 'Player H'])
-    //         expectedJson = {
-    //             players: ['Player G', 'Player H']
-    //         };
-    //     expect(playerSet.toJSON()).toEqual(expectedJson);
-    // });
+        validation = bothWrong.validate();
+        expect(validation.valid).toBe(false);
+        expect(validation.errors.length).toBe(2);
+    });
+
+    it('should generate an up-to-date JSON', function () {
+        var players = ['Player G', 'Player H'],
+            playerSet = PlayerSet(players)
+            expectedJson = {
+                players: players
+            };
+
+        expect(playerSet.toJSON()).toEqual(expectedJson);
+    });
 
 });
