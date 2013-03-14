@@ -1,7 +1,8 @@
 var Game = require('../lib/game'),
     GameState = require('../lib/game-state'),
     PlayerSet = require('../lib/player-set'),
-    PointCounter = require('../lib/point-counter');
+    PointCounter = require('../lib/point-counter'),
+    _ = require('underscore');
 
 describe('A Game', function () {
     
@@ -25,58 +26,54 @@ describe('A Game', function () {
         expect(globalGame.toJSON()).toEqual(expectedJSON);
     });
 
-    it('should initialize with provided options', function () {
-        var providedState = { state: GameState.IN_PROGRESS },
+    it('should initialize with provided components', function () {
+        var defaults = {
+                state: GameState.READY,
+                score: [0, 0],
+                players: ['Player 1', 'Player 2']
+            },
+            providedState = { state: GameState.IN_PROGRESS },
             providedScore = { score: [5, 0] },
-            providedPlayers = { players: ['Player X', 'Player Y'];
+            providedPlayers = { players: ['Player X', 'Player Y'] },
+            expectedJSON,
+            validation;
 
-        expect(doConstructWith()).not.toThrow();
+        expectedJSON = _.extend({}, defaults, providedState);
+        expect(doConstructWith(providedState)).not.toThrow();
         expect(globalGame instanceof Game).toBe(true);
         expect(globalGame.toJSON()).toEqual(expectedJSON);
+        expect(globalGame.validate().valid).toBe(true);
+
+        expectedJSON = _.extend({}, defaults, providedScore);
+        expect(doConstructWith(providedScore)).not.toThrow();
+        expect(globalGame instanceof Game).toBe(true);
+        expect(globalGame.toJSON()).toEqual(expectedJSON);
+        expect(globalGame.validate().valid).toBe(true);
+
+        expectedJSON = _.extend({}, defaults, providedPlayers);
+        expect(doConstructWith(providedPlayers)).not.toThrow();
+        expect(globalGame instanceof Game).toBe(true);
+        expect(globalGame.toJSON()).toEqual(expectedJSON);
+        expect(globalGame.validate().valid).toBe(true);
     });
 
-    xit('should validate with valid provided components', function () {
-        var validGameState = new GameState(GameState.IN_PROGRESS),
-            validPlayerSet = new PlayerSet(['Molly', 'Tracy']),
-            validPointCounter = new PointCounter([5, 0]),
+    it('should not validate with invalid provided components', function () {
+        var invalidPlayerSet = { players: ['Lonely player', ''] },
+            invalidPointCounter = { score: [-1, 0] },
+            bothInvalid = _.extend({}, invalidPlayerSet, invalidPointCounter),
             validation;
 
-        validation = new Game({
-            gameState: validGameState
-        }).validate();
-        expect(validation.valid).toBe(true);
-
-        validation = new Game({
-            playerSet: validPlayerSet
-        }).validate();
-        expect(validation.valid).toBe(true);
-
-        validation = new Game({
-            pointCounter: validPointCounter
-        }).validate();
-        expect(validation.valid).toBe(true);
-    });
-
-    xit('should not validate with invalid provided components', function () {
-        var invalidGameState = new GameState('foo'),
-            invalidPlayerSet = new PlayerSet(['Daisy']),
-            invalidPointCounter = new PointCounter([-2, 0]),
-            validation;
-
-        validation = new Game({
-            gameState: invalidGameState
-        }).validate();
+        validation = Game(invalidPlayerSet).validate();
         expect(validation.valid).toBe(false);
+        expect(validation.errors.length).toBe(1);
 
-        validation = new Game({
-            playerSet: invalidPlayerSet
-        }).validate();
+        validation = Game(invalidPointCounter).validate();
         expect(validation.valid).toBe(false);
+        expect(validation.errors.length).toBe(1);
 
-        validation = new Game({
-            pointCounter: invalidPointCounter
-        }).validate();
+        validation = Game(bothInvalid).validate();
         expect(validation.valid).toBe(false);
+        expect(validation.errors.length).toBe(2);
     });
 
 });
