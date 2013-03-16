@@ -15,18 +15,18 @@ describe('A Game', function () {
     }
 
     it('should initialize with defaults', function () {
-        var expectedJSON = {
-                state: GameState.READY,
-                score: [0, 0],
-                players: ['Player 1', 'Player 2']
-            };
+        var expectedState = GameState.READY,
+            expectedPlayers = ['Player 1', 'Player 2'],
+            expectedScore = [0, 0];
 
         expect(doConstructWith()).not.toThrow();
         expect(globalGame instanceof Game).toBe(true);
-        expect(globalGame.toJSON()).toEqual(expectedJSON);
+        expect(globalGame.gameState.getState()).toBe(expectedState);
+        expect(globalGame.playerSet.getPlayers()).toEqual(expectedPlayers);
+        expect(globalGame.pointCounter.getScore()).toEqual(expectedScore);
     });
 
-    it('should initialize with provided components', function () {
+    it('should initialize a valid game with provided components', function () {
         var defaults = {
                 state: GameState.READY,
                 score: [0, 0],

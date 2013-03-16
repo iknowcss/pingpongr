@@ -161,4 +161,36 @@ describe('A PointCounter', function () {
         expect(pointCounter.toJSON()).toEqual(undoneJSON);
     });
 
+    it('should notify observers only when the score changes', function () {
+        var newScore,
+            pointCounter = PointCounter(),
+            spy = jasmine.createSpy('"new score callback"'),
+            callback = function (score) {
+                newScore = score;
+            };
+
+        pointCounter.observe(spy);
+        pointCounter.observe(callback);
+
+        pointCounter.pointLeft();
+        expect(newScore).toEqual([1, 0]);
+        expect(spy.callCount).toBe(1);
+
+        pointCounter.pointRight();
+        expect(newScore).toEqual([1, 1]);
+        expect(spy.callCount).toBe(2);
+
+        pointCounter.undoPoint();
+        expect(newScore).toEqual([1, 0]);
+        expect(spy.callCount).toBe(3);
+
+        pointCounter.redoPoint();
+        expect(newScore).toEqual([1, 1]);
+        expect(spy.callCount).toBe(4);
+
+        pointCounter.redoPoint();
+        expect(newScore).toEqual([1, 1]);
+        expect(spy.callCount).toBe(4);
+    });
+
 });

@@ -105,4 +105,30 @@ describe('A GameState', function () {
         expect(gameState.toJSON()).toEqual({ state: GameState.ENDED });
     });
 
+    it('should notify observers only if there is a state change', function () {
+        var gameState,
+            newState,
+            spy = jasmine.createSpy('"notify state change"'),
+            callback = function (state) {
+                newState = state;
+            };
+
+        gameState = GameState();            
+        gameState.observe(callback);
+        gameState.startGame();
+        expect(newState).toBe(GameState.IN_PROGRESS);
+        gameState.endGame();
+        expect(newState).toBe(GameState.ENDED);
+
+        gameState = GameState(GameState.IN_PROGRESS);            
+        gameState.observe(callback);
+        gameState.cancelGame();
+        expect(newState).toBe(GameState.CANCELLED);
+        
+        gameState = GameState(GameState.IN_PROGRESS);            
+        gameState.observe(spy);
+        gameState.startGame();
+        expect(spy).not.toHaveBeenCalled();
+    });
+
 });
