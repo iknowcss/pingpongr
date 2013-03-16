@@ -1,5 +1,5 @@
-var GameState = require('../lib/game-state'),
-    _ = require('underscore');
+var GameState = require('../lib/game-state')
+  , _ = require('underscore');
 
 describe('A GameState', function () {
 
@@ -12,8 +12,8 @@ describe('A GameState', function () {
     }
 
     function expectNoStatusChange (initialState, action) {
-        var gameState = GameState(initialState),
-            success;
+        var gameState = GameState(initialState)
+          , success;
 
         success = gameState[action].call();
         expect(success).toBe(false);
@@ -35,8 +35,8 @@ describe('A GameState', function () {
     });
 
     it('should initialize an independent instance with a GameState as the constructor argument', function () {
-        var initialState = GameState.IN_PROGRESS,
-            otherGameState = GameState(initialState);
+        var initialState = GameState.IN_PROGRESS
+          , otherGameState = GameState(initialState);
 
         expect(doConstructWith(otherGameState)).not.toThrow();
         expect(globalGameState instanceof GameState).toBe(true);
@@ -106,10 +106,10 @@ describe('A GameState', function () {
     });
 
     it('should notify observers only if there is a state change', function () {
-        var gameState,
-            newState,
-            spy = jasmine.createSpy('"notify state change"'),
-            callback = function (state) {
+        var gameState
+          , newState
+          , spy = jasmine.createSpy('"notify state change"')
+          , callback = function (state) {
                 newState = state;
             };
 

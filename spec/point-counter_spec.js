@@ -1,6 +1,6 @@
-var PointCounter = require('../lib/point-counter'),
-    PlayerSet = require('../lib/player-set'),
-    _ = require('underscore');
+var PointCounter = require('../lib/point-counter')
+  , PlayerSet = require('../lib/player-set')
+  , _ = require('underscore');
 
 describe('A PointCounter', function () {
 
@@ -27,8 +27,8 @@ describe('A PointCounter', function () {
     });
 
     it('should initialize an independent instance with a PointCounter as the constructor argument', function () {
-        var initialScore = [1, 5],
-            otherPointCounter = PointCounter(initialScore);
+        var initialScore = [1, 5]
+          , otherPointCounter = PointCounter(initialScore);
 
         expect(doConstructWith(otherPointCounter)).not.toThrow();
         expect(globalPointCounter instanceof PointCounter).toBe(true);
@@ -40,10 +40,10 @@ describe('A PointCounter', function () {
     });
 
     it('should not initialize with a bad constructor argument', function () {
-        var wrongType = 1,
-            wrongSize = [1],
-            wrongElementType = ["0", "0"],
-            invalidButNotBad = [-1, 0];
+        var wrongType = 1
+          , wrongSize = [1]
+          , wrongElementType = ["0", "0"]
+          , invalidButNotBad = [-1, 0];
 
         expect(doConstructWith(wrongType)).toThrow();
         expect(doConstructWith(wrongSize)).toThrow();
@@ -52,9 +52,9 @@ describe('A PointCounter', function () {
     });
 
     it('should not validate with an invalid score', function () {
-        var wrongNumberType = [5.5, 0.2],
-            negativeNumber = [-1, -5],
-            validation;
+        var wrongNumberType = [5.5, 0.2]
+          , negativeNumber = [-1, -5]
+          , validation;
 
         validation = PointCounter(wrongNumberType).validate();
         expect(validation.valid).toBe(false);
@@ -66,15 +66,15 @@ describe('A PointCounter', function () {
     });
 
     it('should return an independent, cloned score array', function () {
-        var pointCounter = PointCounter(),
-            score = pointCounter.getScore();
+        var pointCounter = PointCounter()
+          , score = pointCounter.getScore();
         score[0] = 9001;
         expect(pointCounter.getScore()).not.toEqual(score);
     });
 
     it('should allow points to be added to the "left" or "right"', function () {
-        var pointCounter = PointCounter(),
-            score;
+        var pointCounter = PointCounter()
+          , score;
 
         score = pointCounter.pointLeft();
         expect(score).toEqual([1, 0]);
@@ -91,8 +91,8 @@ describe('A PointCounter', function () {
     });
 
     it('should allow points to be undone', function () {
-        var pointCounter = PointCounter(),
-            score;
+        var pointCounter = PointCounter()
+          , score;
 
         // Undo before even started
         score = pointCounter.undoPoint();  // 0 to 0
@@ -114,8 +114,8 @@ describe('A PointCounter', function () {
     });
 
     it('should allow points to be redone after being undone', function () {
-        var pointCounter = PointCounter(),
-            score;
+        var pointCounter = PointCounter()
+          , score;
 
         // Prepare a state and then undo thrice
         pointCounter.pointRight(); // 0 to 1
@@ -143,11 +143,11 @@ describe('A PointCounter', function () {
     });
 
     it('should generate an up-to-date JSON', function () {
-        var pointCounter = PointCounter(),
-            initialPointsJSON = { score: [0, 0] },
-            leftPointsJSON = { score: [1, 0] },
-            bothPointsJSON = { score: [1, 1] },
-            undoneJSON = { score: [1, 0] };
+        var pointCounter = PointCounter()
+          , initialPointsJSON = { score: [0, 0] }
+          , leftPointsJSON = { score: [1, 0] }
+          , bothPointsJSON = { score: [1, 1] }
+          , undoneJSON = { score: [1, 0] };
 
         expect(pointCounter.toJSON()).toEqual(initialPointsJSON);
 
@@ -162,10 +162,10 @@ describe('A PointCounter', function () {
     });
 
     it('should notify observers only when the score changes', function () {
-        var newScore,
-            pointCounter = PointCounter(),
-            spy = jasmine.createSpy('"new score callback"'),
-            callback = function (score) {
+        var newScore
+          , pointCounter = PointCounter()
+          , spy = jasmine.createSpy('"new score callback"')
+          , callback = function (score) {
                 newScore = score;
             };
 
