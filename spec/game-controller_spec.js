@@ -1,44 +1,60 @@
 var GameController = require('../lib/game-controller')
-  , GameState = require('../lib/game-state');
+  , Game = require('../lib/game')
+  , GameState = require('../lib/game-state')
+  , Scoreboard = require('../lib/scoreboard')
+  , _ = require('underscore');
 
-describe('A GameController', function () {
+describe('The GameController', function () {
 
-    it('has a function to get the current game JSON', function () {
-        var expectedJSON = {
-                players: ['Player 1', 'Player 2'],
-                score: [0, 0],
-                state: GameState.ENDED
-            };
+    var scoreboard = GameController.getScoreboard()
+      , gameJSON
+      , spy = jasmine.createSpy('"scoreboard update callback"')
+      , callback = function (param) {
+            console.log(gameJSON = param);
+        };
 
-        expect(GameController.getGameJSON()).toEqual(expectedJSON);
+    scoreboard.observe(callback);
+    scoreboard.observe(spy);
 
+    beforeEach(function () {
+        // GameController.setGame(Game());
     });
 
-    it('has a function to create new games', function () {
-        var expectedJSON = {
-                players: ['Player 1', 'Player 2'],
-                score: [0, 0],
-                state: GameState.READY
-            };
+    xit('stops observing a game when a new game is set', function () {
+        var game = Game({
+                players: ['Molly', 'Tracy']
+            });
 
-        GameController.newGame();
-        expect(GameController.getGameJSON()).toEqual(expectedJSON);
+        spy.reset();
+        GameController.setGame(game);
+        expect(spy.callCount).toBe(1);
+        GameController.startGame();
+        expect(spy.callCount).toBe(2);
+
+
+        spy.reset();
+        GameController.setGame(Game());
+
+        game.gameState.endGame();
+
+        expect(spy.callCount).toBe(1);
+        GameController.startGame();
+        expect(spy.callCount).toBe(2);
     });
 
-    it('has a function to create new games with options', function () {
-        var options = {
-                players: ['Dan', 'Jason'],
-                score: [0, 5],
-                state: GameState.IN_PROGRESS
-            },
-            expectedJSON = options;
+    xit('updates the scoreboard when setting a new game', function () {
+        var game = Game({
+                players: ['Jerry', 'Dixie'],
+                score: [0, 1]
+            });
 
-        GameController.newGame(options);
-        expect(GameController.getGameJSON()).toEqual(expectedJSON);
+        GameController.setGame(game);
+        expect(gameJSON).toEqual(game.toJSON());
     });
 
-    xit('has a function to register scoreboards', function () {
-
+    xit('updates the scoreboard when the game state changes', function () {
+        GameController.startGame();
+        expect(gameJSON.state).toEqual(GameState.IN_PROGRESS);
     });
 
 });
