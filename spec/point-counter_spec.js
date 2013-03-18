@@ -73,49 +73,54 @@ describe('A PointCounter', function () {
     });
 
     it('should allow points to be added to the "left" or "right"', function () {
-        var pointCounter = PointCounter()
-          , score;
+        var pointCounter = PointCounter();
 
-        score = pointCounter.pointLeft();
-        expect(score).toEqual([1, 0]);
-        score = pointCounter.pointRight();
-        expect(score).toEqual([1, 1]);
-        score = pointCounter.pointLeft();
-        expect(score).toEqual([2, 1]);
-        score = pointCounter.pointLeft();
-        expect(score).toEqual([3, 1]);
-        score = pointCounter.pointRight();
-        expect(score).toEqual([3, 2]);
+        pointCounter.pointLeft();
+        expect(pointCounter.getScore()).toEqual([1, 0]);
 
+        pointCounter.pointRight();
+        expect(pointCounter.getScore()).toEqual([1, 1]);
+
+        pointCounter.pointLeft();
+        expect(pointCounter.getScore()).toEqual([2, 1]);
+
+        pointCounter.pointLeft();
+        expect(pointCounter.getScore()).toEqual([3, 1]);
+
+        pointCounter.pointRight();
         expect(pointCounter.getScore()).toEqual([3, 2]);
     });
 
     it('should allow points to be undone', function () {
-        var pointCounter = PointCounter()
-          , score;
+        var pointCounter = PointCounter([5, 1]);
 
-        // Undo before even started
-        score = pointCounter.undoPoint();  // 0 to 0
-        expect(score).toEqual([0, 0]);
+        // Undo before even started; score should remain the same
+        pointCounter.undoPoint();
+        expect(pointCounter.getScore()).toEqual([5, 1]);
 
-        // Undo points
-        pointCounter.pointLeft();          // 1 to 0
-        pointCounter.pointRight();         // 1 to 1
-        score = pointCounter.undoPoint();  // 1 to 0
-        expect(score).toEqual([1, 0]);
-        score = pointCounter.undoPoint();  // 0 to 0
-        expect(score).toEqual([0, 0]);
-        score = pointCounter.undoPoint();  // 0 to 0 (still)
-        expect(score).toEqual([0, 0]);
+        pointCounter.pointLeft();          // 6 to 1
+        pointCounter.pointRight();         // 6 to 2
+
+        // Undo point
+        pointCounter.undoPoint();
+        expect(pointCounter.getScore()).toEqual([6, 1]);
+
+        // Undo again
+        pointCounter.undoPoint();
+        expect(pointCounter.getScore()).toEqual([5, 1]);
+
+        // Undo "too far"; score should remain the same
+        pointCounter.undoPoint();
+        expect(pointCounter.getScore()).toEqual([5, 1]);
 
         // Continue after undoing "too far"
-        score = pointCounter.pointRight(); // 0 to 1
-        expect(score).toEqual([0, 1]);
+        pointCounter.pointRight();
+        expect(pointCounter.getScore()).toEqual([5, 2]);
     });
 
     it('should allow points to be redone after being undone', function () {
         var pointCounter = PointCounter()
-          , score;
+          , success;
 
         // Prepare a state and then undo thrice
         pointCounter.pointRight(); // 0 to 1
@@ -128,18 +133,18 @@ describe('A PointCounter', function () {
         pointCounter.undoPoint();  // 0 to 2
 
         // Test redo
-        score = pointCounter.redoPoint(); // 1 to 2
-        expect(score).toEqual([1, 2]);
-        score = pointCounter.redoPoint(); // 2 to 2
-        expect(score).toEqual([2, 2]);
+        pointCounter.redoPoint(); // 1 to 2
+        expect(pointCounter.getScore()).toEqual([1, 2]);
+        pointCounter.redoPoint(); // 2 to 2
+        expect(pointCounter.getScore()).toEqual([2, 2]);
 
         // Overwrite the 3rd point
-        score = pointCounter.pointLeft(); // 3 to 2
-        expect(score).toEqual([3, 2]);
+        pointCounter.pointLeft(); // 3 to 2
+        expect(pointCounter.getScore()).toEqual([3, 2]);
 
         // Redo beyond current score
-        score = pointCounter.redoPoint(); // 3 to 2 (still)
-        expect(score).toEqual([3, 2]);
+        pointCounter.redoPoint(); // 3 to 2 (still)
+        expect(pointCounter.getScore()).toEqual([3, 2]);
     });
 
     it('should generate an up-to-date JSON', function () {
