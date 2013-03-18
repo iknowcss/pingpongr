@@ -7,54 +7,58 @@ var GameController = require('../lib/game-controller')
 describe('The GameController', function () {
 
     var scoreboard = GameController.getScoreboard()
-      , gameJSON
-      , spy = jasmine.createSpy('"scoreboard update callback"')
+      , currentGameJSON
       , callback = function (param) {
-            console.log(gameJSON = param);
+            currentGameJSON = param;
         };
 
     scoreboard.observe(callback);
-    scoreboard.observe(spy);
 
     beforeEach(function () {
-        // GameController.setGame(Game());
-    });
-
-    xit('stops observing a game when a new game is set', function () {
-        var game = Game({
-                players: ['Molly', 'Tracy']
-            });
-
-        spy.reset();
-        GameController.setGame(game);
-        expect(spy.callCount).toBe(1);
-        GameController.startGame();
-        expect(spy.callCount).toBe(2);
-
-
-        spy.reset();
         GameController.setGame(Game());
-
-        game.gameState.endGame();
-
-        expect(spy.callCount).toBe(1);
-        GameController.startGame();
-        expect(spy.callCount).toBe(2);
     });
 
-    xit('updates the scoreboard when setting a new game', function () {
+    it('updates the scoreboard when setting a new game', function () {
         var game = Game({
                 players: ['Jerry', 'Dixie'],
                 score: [0, 1]
             });
 
         GameController.setGame(game);
-        expect(gameJSON).toEqual(game.toJSON());
+        expect(currentGameJSON).toEqual(game.toJSON());
     });
 
-    xit('updates the scoreboard when the game state changes', function () {
+    it('updates the scoreboard when the game state changes', function () {
         GameController.startGame();
-        expect(gameJSON.state).toEqual(GameState.IN_PROGRESS);
+        expect(currentGameJSON.state).toEqual(GameState.IN_PROGRESS);
+    });
+
+    it('stops observing the current game when a new game is set', function () {
+        var spy = spyOn(scoreboard, 'update').andCallThrough()
+            game = Game({
+                players: ['Molly', 'Tracy']
+            });
+
+        // Set the game to a game we have a reference to
+        GameController.setGame(game);
+        expect(spy.callCount).toBe(1);
+
+        // Start the game and ensure scoreboard.update() is called
+        GameController.startGame();
+        expect(spy.callCount).toBe(2);
+
+        // Reset spy.callCount
+        spy.reset();
+
+        // Set the game to a completely new game
+        GameController.setGame(Game());
+        expect(spy.callCount).toBe(1);
+
+        // Ensure that making changes to the game we have reference to
+        // which should not be active anymore does not cause 
+        // scoreboard.update() to be called
+        game.gameState.endGame();
+        expect(spy.callCount).toBe(1);
     });
 
 });
