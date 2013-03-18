@@ -8,6 +8,7 @@ describe('The GameController', function () {
 
     var scoreboard = GameController.getScoreboard()
       , currentGameJSON
+      , spy
       , callback = function (param) {
             currentGameJSON = param;
         };
@@ -16,6 +17,7 @@ describe('The GameController', function () {
 
     beforeEach(function () {
         GameController.setGame(Game());
+        spy = spyOn(scoreboard, 'update').andCallThrough();
     });
 
     it('updates the scoreboard when setting a new game', function () {
@@ -31,11 +33,34 @@ describe('The GameController', function () {
     it('updates the scoreboard when the game state changes', function () {
         GameController.startGame();
         expect(currentGameJSON.state).toEqual(GameState.IN_PROGRESS);
+
+        GameController.endGame();
+        expect(currentGameJSON.state).toEqual(GameState.ENDED);
+
+        GameController.setGame(Game());
+        expect(currentGameJSON.state).toEqual(GameState.READY);
+
+        GameController.startGame();
+        GameController.cancelGame();
+        expect(currentGameJSON.state).toEqual(GameState.CANCELLED);
+    });
+
+    it('updates the scoreboard when the score changes', function () {
+        GameController.pointLeft();
+        expect(currentGameJSON.score).toEqual([1, 0]);
+
+        GameController.pointRight();
+        expect(currentGameJSON.score).toEqual([1, 1]);
+
+        GameController.undoPoint();
+        expect(currentGameJSON.score).toEqual([1, 0]);
+
+        GameController.redoPoint();
+        expect(currentGameJSON.score).toEqual([1, 1]);
     });
 
     it('stops observing the current game when a new game is set', function () {
-        var spy = spyOn(scoreboard, 'update').andCallThrough()
-            game = Game({
+        var game = Game({
                 players: ['Molly', 'Tracy']
             });
 
