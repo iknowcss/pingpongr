@@ -131,4 +131,21 @@ describe('A GameState', function () {
         expect(spy).not.toHaveBeenCalled();
     });
 
+    it('should have a comparison function', function () {
+        var ready = GameState(GameState.READY)
+          , inProgress = GameState(GameState.IN_PROGRESS)
+          , ended = GameState(GameState.ENDED)
+          , cancelled = GameState(GameState.CANCELLED);
+
+        expect(ready.equals(GameState.READY)).toBe(true);
+        expect(inProgress.equals(GameState.IN_PROGRESS)).toBe(true);
+        expect(ended.equals(GameState.ENDED)).toBe(true);
+        expect(cancelled.equals(GameState.CANCELLED)).toBe(true);
+
+        expect(ready.equals(GameState(GameState.READY))).toBe(true);
+        expect(inProgress.equals(GameState(GameState.IN_PROGRESS))).toBe(true);
+        expect(ended.equals(GameState(GameState.ENDED))).toBe(true);
+        expect(cancelled.equals(GameState(GameState.CANCELLED))).toBe(true);
+    });
+
 });

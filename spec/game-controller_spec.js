@@ -45,7 +45,15 @@ describe('The GameController', function () {
         expect(currentGameJSON.state).toEqual(GameState.CANCELLED);
     });
 
+    it('does not allow point change when game is not in progress ', function () {
+        GameController.pointLeft();
+        GameController.pointRight();
+        expect(currentGameJSON.score).toEqual([0, 0]);
+    });
+
     it('updates the scoreboard when the score changes', function () {
+        GameController.startGame();
+
         GameController.pointLeft();
         expect(currentGameJSON.score).toEqual([1, 0]);
 
