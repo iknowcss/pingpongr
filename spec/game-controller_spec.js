@@ -49,6 +49,21 @@ describe('The GameController', function () {
         GameController.pointLeft();
         GameController.pointRight();
         expect(currentGameJSON.score).toEqual([0, 0]);
+
+        GameController.startGame();
+        GameController.pointLeft();
+        GameController.pointRight();
+        GameController.pointRight();
+        expect(currentGameJSON.score).toEqual([1, 2]);
+        GameController.undoPoint();
+        GameController.undoPoint();
+        expect(currentGameJSON.score).toEqual([1, 0]);
+        GameController.redoPoint();
+        expect(currentGameJSON.score).toEqual([1, 1]);
+
+        GameController.endGame();
+        GameController.redoPoint();
+        expect(currentGameJSON.score).toEqual([1, 1]);
     });
 
     it('updates the scoreboard when the score changes', function () {
