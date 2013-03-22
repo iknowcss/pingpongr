@@ -1,4 +1,5 @@
 var ScoreboardRouter = require('../../lib/router/scoreboard-router')
+  , Game = require('../../lib/model/game')
   , _ = require('underscore')
   , io = require('socket.io-client')
 
@@ -60,24 +61,38 @@ describe('A ScoreboardRouter', function () {
     // Mock client and functions
     mockClient = new function () {
 
-        this.handleList = function (data) {
-            mockClient.list = data;
+        this.handleUpdate = function (data) {
+            mockClient.gameJSON = data;
         };
 
     };
 
-    it('emits a list of available scoreboards upon connection', function () {
-        var listSpy = spyOn(mockClient, 'handleList').andCallThrough();
+    it('emits the current game JSON on connection', function () {
+        var updateSpy = spyOn(mockClient, 'handleUpdate').andCallThrough()
+          , gameJSON
+          , game;
 
-        socket.on('list', listSpy);
+        // Register the spied function to receive data from the server
+        socket.on('game', updateSpy);
 
-        waitsFor(connectionState.isConnected, 'client to connect');
-        waitsFor(function () {
-            return listSpy.wasCalled;
-        }, 'socket to emit list');
+        // Wait for client to connect
+        waitsFor(connectionState.isConnected, 'client to connect', 1000);
 
+        // Wait for client to get data
+        waitsFor(function () { return updateSpy.wasCalled; }, 'socket to emit list', 1000);
+
+        // Build a Game object from the returned data
         runs(function () {
-            expect(mockClient.list instanceof Array).toBe(true);
+            gameJSON = mockClient.gameJSON;
+
+            expect(gameJSON).not.toBeUndefined();
+            expect(gameJSON.state).not.toBeUndefined();
+            expect(gameJSON.score).not.toBeUndefined();
+            expect(gameJSON.players).not.toBeUndefined();
+
+            expect(function () {
+                game = Game(gameJSON);    
+            }).not.toThrow();
         });
     });
 
