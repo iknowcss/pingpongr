@@ -1,5 +1,5 @@
-var PlayerSet = require('../lib/player-set')
-  , Validator = require('../lib/validator')
+var PlayerSet = require('../../lib/model/player-set')
+  , Validator = require('../../lib/model/validator')
   , _ = require('underscore');
 
 describe('A PlayerSet', function () {

@@ -1,7 +1,7 @@
 var GameController = require('../lib/game-controller')
-  , Game = require('../lib/game')
-  , GameState = require('../lib/game-state')
-  , Scoreboard = require('../lib/scoreboard')
+  , Game = require('../lib/model/game')
+  , GameState = require('../lib/model/game-state')
+  , Scoreboard = require('../lib/model/scoreboard')
   , _ = require('underscore');
 
 describe('The GameController', function () {

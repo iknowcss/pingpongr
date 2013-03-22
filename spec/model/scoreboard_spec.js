@@ -1,6 +1,6 @@
-var Scoreboard = require('../lib/scoreboard')
-  , Game = require('../lib/game')
-  , GameState = require('../lib/game-state');
+var Scoreboard = require('../../lib/model/scoreboard')
+  , Game = require('../../lib/model/game')
+  , GameState = require('../../lib/model/game-state');
 
 describe('A Scoreboard', function () {
 

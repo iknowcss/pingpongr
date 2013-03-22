@@ -1,4 +1,4 @@
-var GameState = require('../lib/game-state')
+var GameState = require('../../lib/model/game-state')
   , _ = require('underscore');
 
 describe('A GameState', function () {
