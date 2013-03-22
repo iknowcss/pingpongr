@@ -17,8 +17,8 @@ var ScoreboardRouter = require('../../lib/router/scoreboard-router')
   , connectionString = ':' + port + namespace
   , connection;
 
-// State tracker of the connection
-connectionState = new (function () {
+// State tracker for the connection
+connectionState = new function () {
     var connected = false;
     this.connected = function () {
         connected = true;
@@ -29,7 +29,7 @@ connectionState = new (function () {
     this.isConnected = function () {
         return connected;
     };
-})();
+};
 
 // Prepare the server and attach the ScoreboardRouter
 server = require('http').createServer();
@@ -40,7 +40,8 @@ server.listen(port);
 
 describe('A ScoreboardRouter', function () {
     
-    var socket;
+    var socket
+      , mockClient;
 
     // Before each, open the client socket
     beforeEach(function () {
@@ -56,9 +57,17 @@ describe('A ScoreboardRouter', function () {
         }
     });
 
+    // Mock client and functions
+    mockClient = new function () {
+
+        this.handleList = function (data) {
+            mockClient.list = data;
+        };
+
+    };
+
     it('emits a list of available scoreboards upon connection', function () {
-        var listSpy = jasmine.createSpy()
-          , emittedList;
+        var listSpy = spyOn(mockClient, 'handleList').andCallThrough();
 
         socket.on('list', listSpy);
 
@@ -68,8 +77,7 @@ describe('A ScoreboardRouter', function () {
         }, 'socket to emit list');
 
         runs(function () {
-            emittedList = listSpy.calls[0].args[0];
-            expect(emittedList instanceof Array).toBe(true);
+            expect(mockClient.list instanceof Array).toBe(true);
         });
     });
 
