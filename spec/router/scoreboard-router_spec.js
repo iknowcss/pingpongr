@@ -1,4 +1,4 @@
-var ScoreboardRouter = require('../lib/scoreboard-router')
+var ScoreboardRouter = require('../../lib/router/scoreboard-router')
   , _ = require('underscore')
   , io = require('socket.io-client')
 
