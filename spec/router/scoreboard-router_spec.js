@@ -1,4 +1,5 @@
 var ScoreboardRouter = require('../../lib/router/scoreboard-router')
+  , GameController = require('../../lib/controller/game-controller')
   , Game = require('../../lib/model/game')
   , _ = require('underscore')
   , io = require('socket.io-client')
@@ -13,6 +14,7 @@ var ScoreboardRouter = require('../../lib/router/scoreboard-router')
         'log': false
     }
 
+  , scoreboard = GameController.getScoreboard()
   , port = 8888
   , namespace = '/scoreboard'
   , connectionString = ':' + port + namespace
@@ -46,6 +48,7 @@ describe('A ScoreboardRouter', function () {
 
     // Before each, open the client socket
     beforeEach(function () {
+        GameController.newGame();
         connectionState.disconnected();
         socket = io.connect(connectionString, ioClientOptions);
         socket.on('connect', connectionState.connected);
@@ -79,21 +82,45 @@ describe('A ScoreboardRouter', function () {
         waitsFor(connectionState.isConnected, 'client to connect', 1000);
 
         // Wait for client to get data
-        waitsFor(function () { return updateSpy.wasCalled; }, 'socket to emit list', 1000);
+        waitsFor(function () { return updateSpy.wasCalled; }, 'socket to emit', 1000);
 
         // Build a Game object from the returned data
         runs(function () {
-            gameJSON = mockClient.gameJSON;
-
-            expect(gameJSON).not.toBeUndefined();
-            expect(gameJSON.state).not.toBeUndefined();
-            expect(gameJSON.score).not.toBeUndefined();
-            expect(gameJSON.players).not.toBeUndefined();
-
-            expect(function () {
-                game = Game(gameJSON);    
-            }).not.toThrow();
+            expect(mockClient.gameJSON).toEqual(scoreboard.toJSON());
         });
+    });
+
+    it('emits the current game JSON on scoreboard update', function () {
+        var updateSpy = spyOn(mockClient, 'handleUpdate').andCallThrough()
+          , gameJSON
+          , game;
+
+        socket.on('game', updateSpy);
+
+        waitsFor(connectionState.isConnected, 'client to connect', 1000);
+        waitsFor(function () { return updateSpy.wasCalled; }, 'socket to emit', 1000);
+
+        runs(function () {
+            updateSpy.reset();
+            GameController.startGame();
+        });
+
+        waitsFor(function () { return updateSpy.wasCalled; }, 'socket to emit', 1000);
+
+        runs(function () {
+            updateSpy.reset();
+            expect(mockClient.gameJSON).toEqual(scoreboard.toJSON());
+
+            GameController.pointLeft();
+        });
+
+        waitsFor(function () { return updateSpy.wasCalled; }, 'socket to emit', 1000);
+
+        runs(function () {
+            updateSpy.reset();
+            expect(mockClient.gameJSON).toEqual(scoreboard.toJSON());
+        });
+
     });
 
     // Stop the server listening

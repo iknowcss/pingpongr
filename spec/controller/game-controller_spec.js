@@ -16,8 +16,14 @@ describe('The GameController', function () {
     scoreboard.observe(callback);
 
     beforeEach(function () {
-        GameController.setGame(Game());
+        GameController.newGame();
         spy = spyOn(scoreboard, 'update').andCallThrough();
+    });
+
+    it('has a function to start a new game with defaults', function () {
+        GameController.startGame();
+        GameController.newGame();
+        expect(currentGameJSON).toEqual(Game().toJSON());
     });
 
     it('updates the scoreboard when setting a new game', function () {
