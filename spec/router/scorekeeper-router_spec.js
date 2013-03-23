@@ -46,45 +46,70 @@ describe('A ScorekeeperRouter', function () {
     
     var socket
       , mockClient
-      , updateSpy;
+      , updateSpy
+      , errorSpy;
 
-    function gameDataReceived () {
-        if (updateSpy.wasCalled) {
-            updateSpy.reset();
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    // Before each, open the client socket
-    beforeEach(function () {
-        runs(function () {
-            GameController.newGame();
-            connectionState.disconnected();
-            socket = io.connect(connectionString, ioClientOptions);
-            socket.on('connect', connectionState.connected);
-            updateSpy = spyOn(mockClient, 'handleUpdate').andCallThrough();
-            socket.on('game', updateSpy);
-        });
-        waitsFor(connectionState.isConnected, 'client to connect', 1000);
-    });
-
-    // After each, disconnect the socket
-    afterEach(function () {
-        if (socket && socket.socket.connected) {
-            socket.disconnect();
-        }
-    });
-
-    // Mock client and functions
+    /* Mock client and functions */
     mockClient = new function () {
 
         this.handleUpdate = function (data) {
             mockClient.gameJSON = data;
         };
 
+        this.handleError = function (data) {
+            mockClient.error = data;
+        };
+
     };
+
+    /* Handlers */
+    function abstractReceived (spy) {
+        if (spy.wasCalled) {
+            spy.reset();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    function gameDataReceived () {
+        return abstractReceived(updateSpy);
+    }
+
+    function errorReceived () {
+        return abstractReceived(errorSpy);
+    }
+
+    // Before each, open the client socket
+    beforeEach(function () {
+        runs(function () {
+            // Put everything into a clean initial state
+            GameController.newGame();
+            connectionState.disconnected();
+            mockClient.gameJSON = undefined;
+            mockClient.error = undefined;
+
+            // Spy on the mockClient
+            updateSpy = spyOn(mockClient, 'handleUpdate').andCallThrough();
+            errorSpy = spyOn(mockClient, 'handleError').andCallThrough();
+
+            // Prepare the connection and bindings
+            socket = io.connect(connectionString, ioClientOptions);
+            socket.on('connect', connectionState.connected);
+            socket.on('game', updateSpy);
+            socket.on('error', errorSpy);
+        });
+
+        // Wait for connection to occur before continuing
+        waitsFor(connectionState.isConnected, 'client to connect', 1000);
+    });
+
+    // After each test, disconnect the socket
+    afterEach(function () {
+        if (socket && socket.socket.connected) {
+            socket.disconnect();
+        }
+    });
 
     it('emits the current game JSON on connection', function () {
         waitsFor(gameDataReceived, 'game data to be received', 1000);
@@ -156,6 +181,32 @@ describe('A ScorekeeperRouter', function () {
                 state: GameState.READY
             });
         });
+    });
+
+    it('emits an exception error and not a game JSON when the provided new game is bad', function () {
+        var badGameJSON = {
+                players: ['Jenny']
+            };
+
+        waitsFor(gameDataReceived, 'error to be received', 1000);
+        runs(function () {
+            socket.emit('command-create', badGameJSON);
+        });
+
+        waitsFor(errorReceived, 'error to be received', 1000);
+        runs(function () {
+            // Verify exception
+            expect(mockClient.error).not.toBeUndefined();
+            expect(mockClient.error.type).toBe('exception');
+            expect(typeof mockClient.error.message).toBe('string');
+
+            // Ensure that game JSON wasn't emitted
+            expect(updateSpy).not.toHaveBeenCalled();
+        });
+    });
+
+    xit('emits a validation error and not a game JSON when the provided new game is bad', function () {
+        // TODO
     });
 
     it('allows the score keeper to change the game state', function () {

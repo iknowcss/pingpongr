@@ -122,4 +122,26 @@ describe('The GameController', function () {
         expect(spy.callCount).toBe(1);
     });
 
+    it('throws an exception when a bad game JSON is provided', function () {
+        var badGameJSON = {
+                players: ['Jen']
+            }
+          , setBadGame = function () {
+                GameController.setGame(badGameJSON);
+            };
+
+        expect(setBadGame).toThrow();
+    });
+
+    it('throws a validation exception when an invalid game is provided', function () {
+        var invalidGameJSON = {
+                score: [-1, 0]
+            }
+          , setInvalidGame = function () {
+                GameController.setGame(invalidGameJSON);
+            };
+
+        expect(setInvalidGame).toThrow();
+    });
+
 });
