@@ -137,6 +137,27 @@ describe('A ScorekeeperRouter', function () {
         });
     });
 
+    it('allows the score keeper to create a new game', function () {
+        var newGameJSON = {
+                players: ['Jenny', 'Amy'],
+                score: [5, 0]
+            };
+
+        waitsFor(gameDataReceived, 'game data to be received', 1000);
+        runs(function () {
+            socket.emit('command-create', newGameJSON);
+        });
+
+        waitsFor(gameDataReceived, 'game data to be received', 1000);
+        runs(function () {
+            expect(mockClient.gameJSON).toEqual({
+                players: newGameJSON.players,
+                score: newGameJSON.score,
+                state: GameState.READY
+            });
+        });
+    });
+
     it('allows the score keeper to change the game state', function () {
         waitsFor(gameDataReceived, 'game data to be received', 1000);
         runs(function () {

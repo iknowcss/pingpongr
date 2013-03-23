@@ -30,10 +30,17 @@ describe('The GameController', function () {
         var game = Game({
                 players: ['Jerry', 'Dixie'],
                 score: [0, 1]
-            });
+            })
+          , otherGameJSON = {
+                players: ['Lori', 'Michael'],
+                score: [2, 0]
+            };
 
         GameController.setGame(game);
         expect(currentGameJSON).toEqual(game.toJSON());
+
+        GameController.setGame(otherGameJSON);
+        expect(currentGameJSON).toEqual(Game(otherGameJSON).toJSON());
     });
 
     it('updates the scoreboard when the game state changes', function () {
