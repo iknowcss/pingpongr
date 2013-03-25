@@ -205,8 +205,26 @@ describe('A ScorekeeperRouter', function () {
         });
     });
 
-    xit('emits a validation error and not a game JSON when the provided new game is bad', function () {
-        // TODO
+    it('emits a validation error and not a game JSON when the provided new game is bad', function () {
+        var invalidGameJSON = {
+                score: [-1, 0]
+            };
+
+        waitsFor(gameDataReceived, 'error to be received', 1000);
+        runs(function () {
+            socket.emit('command-create', invalidGameJSON);
+        });
+
+        waitsFor(errorReceived, 'error to be received', 1000);
+        runs(function () {
+            // Verify exception
+            expect(mockClient.error).not.toBeUndefined();
+            expect(mockClient.error.type).toBe('validation');
+            expect(_.isArray(mockClient.error.errors)).toBe(true);
+
+            // Ensure that game JSON wasn't emitted
+            expect(updateSpy).not.toHaveBeenCalled();
+        });
     });
 
     it('allows the score keeper to change the game state', function () {

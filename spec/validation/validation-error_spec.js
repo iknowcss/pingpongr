@@ -50,4 +50,32 @@ describe('A ValidationError', function () {
         expect(validationError.errors).toEqual(expectedErrors);
     });
 
+    it('generates an independent, up-to-date JSON', function () {
+        var validationError = ValidationError()
+          , expectedErrors
+          , returnedJSON;
+
+        expectedErrors = {
+            errors: []
+        };
+        expect(validationError.toJSON()).toEqual(expectedErrors);
+
+        validationError.errors.push('alpha');
+        expectedErrors = {
+            errors: ['alpha']
+        };
+        expect(validationError.toJSON()).toEqual(expectedErrors);
+
+        validationError.errors.push('beta');
+        expectedErrors = {
+            errors: ['alpha', 'beta']
+        };
+        expect(validationError.toJSON()).toEqual(expectedErrors);
+
+        // Tamper with the returned JSON and ensure it is independnent
+        returnedJSON = validationError.toJSON();
+        returnedJSON.errors.push('gamma');
+        expect(validationError.toJSON()).toEqual(expectedErrors);
+    });
+
 });
