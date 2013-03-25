@@ -208,6 +208,10 @@ describe('A ScorekeeperRouter', function () {
     it('emits a validation error and not a game JSON when the provided new game is bad', function () {
         var invalidGameJSON = {
                 score: [-1, 0]
+            }
+          , doubleInvalidGameJSON = {
+                score: [0, -1],
+                players: ['', 'Other player']
             };
 
         waitsFor(gameDataReceived, 'error to be received', 1000);
@@ -221,9 +225,20 @@ describe('A ScorekeeperRouter', function () {
             expect(mockClient.error).not.toBeUndefined();
             expect(mockClient.error.type).toBe('validation');
             expect(_.isArray(mockClient.error.errors)).toBe(true);
+            expect(mockClient.error.errors.length).toBe(1);
 
             // Ensure that game JSON wasn't emitted
             expect(updateSpy).not.toHaveBeenCalled();
+
+            socket.emit('command-create', doubleInvalidGameJSON);
+        });
+
+        waitsFor(errorReceived, 'error to be received', 1000);
+        runs(function () {
+            expect(mockClient.error).not.toBeUndefined();
+            expect(mockClient.error.type).toBe('validation');
+            expect(_.isArray(mockClient.error.errors)).toBe(true);
+            expect(mockClient.error.errors.length).toBe(2);
         });
     });
 
@@ -256,8 +271,19 @@ describe('A ScorekeeperRouter', function () {
         });
     });
 
-    xit('notifies the score keeper of invalid game state transitions', function () {
-        // TODO
+    it('emits an error in the case of an invalid game state transitions', function () {
+        waitsFor(gameDataReceived, 'game data to be received', 1000);
+        runs(function () {
+            socket.emit('command-state', 'end');
+        });
+
+        waitsFor(errorReceived, 'error to be received', 1000);
+        runs(function () {
+            expect(mockClient.error).not.toBeUndefined();
+
+            // Ensure that game JSON wasn't emitted
+            expect(updateSpy).not.toHaveBeenCalled();
+        });
     });
 
     // Stop the server listening
