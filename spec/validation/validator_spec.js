@@ -8,49 +8,49 @@ describe('A Validator', function () {
     /* Validation functions */
     function firstLetterIsA (validator, str) {
         if (str[0] != 'a') {
-            validator.error('1st letter should be "a"');
+            validator.err('1st letter should be "a"');
         }
     }
 
     function secondLetterIsB (validator, str) {
         if (str[1] != 'b') {
-            validator.error('2nd letter should be "b"').stop();
+            validator.err('2nd letter should be "b"').stop();
         }
     }
 
     function thirdLetterIsC (validator, str) {
         if (str[2] != 'c') {
-            validator.error('3rd letter should be "c"');
+            validator.err('3rd letter should be "c"');
         }
     }
 
     function fourthLetterIsD (validator, str) {
         if (str[3] != 'd') {
-            validator.error('4th letter should be "d"');
+            validator.err('4th letter should be "d"');
         }
     }
 
     function fifthLetterIsE (validator, str) {
         if (str[4] != 'e') {
-            validator.error('5th letter should be "e"');
+            validator.err('5th letter should be "e"');
         }
     }
 
     function firstLetterIsX (validator, str) {
         if (str[0] != 'x') {
-            validator.error('1st letter should be "x"');
+            validator.err('1st letter should be "x"');
         }
     }
 
     function secondLetterIsY (validator, str) {
         if (str[1] != 'y') {
-            validator.error('2nd letter should be "y"').stop();
+            validator.err('2nd letter should be "y"').stop();
         }
     }
 
     function thirdLetterIsZ (validator, str) {
         if (str[2] != 'z') {
-            validator.error('3rd letter should be "z"');
+            validator.err('3rd letter should be "z"');
         }
     }
 
@@ -60,9 +60,9 @@ describe('A Validator', function () {
     });
 
     it('should have a function to evaluate validity', function () {
-        var validation,
-            validStr = 'abc',
-            invalidStr = 'axc';
+        var validation
+          , validStr = 'abc'
+          , invalidStr = 'axc';
 
         validation = validator.validate(validStr);
         expect(validation.valid).toBe(true);
@@ -75,16 +75,16 @@ describe('A Validator', function () {
 
     it('should throw an exception if an error is added when validation is not in progress', function () {
         var badCall = function () {
-            validation.error('foo');
+            validation.err('foo');
         };
 
         expect(badCall).toThrow();
     });
 
     it('should validate with an array or collection of validation functions', function () {
-        var validator,
-            validation,
-            expectedErrors;
+        var validator
+          , validation
+          , expectedErrors;
 
         // Array
         validator = new Validator([
@@ -118,11 +118,11 @@ describe('A Validator', function () {
     });
 
     it('should accept other Validator objects as subvalidators', function () {
-        var testString,
-            expectedErrors,
-            dValidator,
-            finalValidator,
-            validation;
+        var testString
+          , expectedErrors
+          , dValidator
+          , finalValidator
+          , validation;
 
         testString = 'xbcwv';
         expectedErrors = [
@@ -140,18 +140,18 @@ describe('A Validator', function () {
     });
 
     it('should allow other validations to be appended', function () {
-        var testStr = 'xyz',
-            firstLetterValidator = new Validator(firstLetterIsA),
-            expectedErrors = [
+        var testStr = 'xyz'
+          , firstLetterValidator = new Validator(firstLetterIsA)
+          , expectedErrors = [
                 'was not at least 4 letters',
                 '1st letter should be "a"'
-            ],
-            validation;
+            ]
+          , validation;
 
         validator = new Validator(function (validator, str) {
             var vn;
             if (str.length < 4) {
-                validator.error('was not at least 4 letters');
+                validator.err('was not at least 4 letters');
             }
             vn = firstLetterValidator.validate(str);
             validator.append(vn);
@@ -164,8 +164,8 @@ describe('A Validator', function () {
     it('should only allow Validation objects to be appended', function () {
         var validator = new Validator(function (validator, str) {
                 validator.append({});
-            }),
-            badCall = function () {
+            })
+          , badCall = function () {
                 validator.validate();
             };
 
@@ -175,8 +175,8 @@ describe('A Validator', function () {
     it('should stop validating an object when specified', function () {
         var expectedErrors = [ 
                 '2nd letter should be "b"'
-            ],
-            validation = validator.validate('ayc');
+            ]
+          , validation = validator.validate('ayc');
 
         expect(validation.valid).toBe(false);
         expect(validation.errors).toEqual(expectedErrors);
