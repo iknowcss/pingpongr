@@ -45,14 +45,47 @@ server.listen(port);
 describe('A ScoreboardRouter', function () {
     
     var socket
-      , mockClient;
+      , mockClient
+      , updateSpy;
+
+    /* Mock client and functions */
+    mockClient = new function () {
+
+        this.handleUpdate = function (data) {
+            mockClient.gameJSON = data;
+        };
+
+    };
+
+    /* Handlers */
+    function gameDataReceived () {
+        if (updateSpy.wasCalled) {
+            updateSpy.reset();
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     // Before each, open the client socket
     beforeEach(function () {
-        GameController.newGame();
-        connectionState.disconnected();
-        socket = io.connect(connectionString, ioClientOptions);
-        socket.on('connect', connectionState.connected);
+        runs(function () {
+            // Put everything into a clean initial state
+            GameController.newGame();
+            connectionState.disconnected();
+            mockClient.gameJSON = undefined;
+
+            // Spy on the mockClient
+            updateSpy = spyOn(mockClient, 'handleUpdate').andCallThrough();
+
+            // Prepare the connection and bindings
+            socket = io.connect(connectionString, ioClientOptions);
+            socket.on('connect', connectionState.connected);
+            socket.on('game', updateSpy);
+        });
+
+        // Wait for connection to occur before continuing
+        waitsFor(connectionState.isConnected, 'client to connect', 1000);
     });
 
     // After each, disconnect the socket
@@ -62,27 +95,8 @@ describe('A ScoreboardRouter', function () {
         }
     });
 
-    // Mock client and functions
-    mockClient = new function () {
-
-        this.handleUpdate = function (data) {
-            mockClient.gameJSON = data;
-        };
-
-    };
-
     it('emits the current game JSON on connection', function () {
-        var updateSpy = spyOn(mockClient, 'handleUpdate').andCallThrough()
-          , gameJSON;
-
-        // Register the spied function to receive data from the server
-        socket.on('game', updateSpy);
-
-        // Wait for client to connect
-        waitsFor(connectionState.isConnected, 'client to connect', 1000);
-
-        // Wait for client to get data
-        waitsFor(function () { return updateSpy.wasCalled; }, 'socket to emit', 1000);
+        waitsFor(gameDataReceived, 'game data to be received', 1000);
 
         // Build a Game object from the returned data
         runs(function () {
@@ -91,66 +105,45 @@ describe('A ScoreboardRouter', function () {
     });
 
     it('emits the current game JSON on scoreboard update', function () {
-        var updateSpy = spyOn(mockClient, 'handleUpdate').andCallThrough()
-          , gameJSON;
-
-        socket.on('game', updateSpy);
-
-        waitsFor(connectionState.isConnected, 'client to connect', 1000);
-        waitsFor(function () { return updateSpy.wasCalled; }, 'socket to emit', 1000);
-
+        waitsFor(gameDataReceived, 'game data to be received', 1000);
         runs(function () {
-            updateSpy.reset();
             GameController.startGame();
         });
 
-        waitsFor(function () { return updateSpy.wasCalled; }, 'socket to emit', 1000);
-
+        waitsFor(gameDataReceived, 'game data to be received', 1000);
         runs(function () {
-            updateSpy.reset();
             expect(mockClient.gameJSON).toEqual(scoreboard.toJSON());
-
             GameController.pointLeft();
         });
 
-        waitsFor(function () { return updateSpy.wasCalled; }, 'socket to emit', 1000);
-
+        waitsFor(gameDataReceived, 'game data to be received', 1000);
         runs(function () {
             expect(mockClient.gameJSON).toEqual(scoreboard.toJSON());
         });
-
     });
 
     it('emits the current game JSON upon request', function () {
-        var updateSpy = spyOn(mockClient, 'handleUpdate').andCallThrough()
-          , gameJSON
-          , game = Game({
-                    players: ['Dan', 'Carl'],
-                    score:   [5, 0],
-                    state:   GameState.IN_PROGRESS
-                });
+        var game = Game({
+                players: ['Dan', 'Carl'],
+                score:   [5, 0],
+                state:   GameState.IN_PROGRESS
+            });
 
         // Set the game
         GameController.setGame(game);
         expect(scoreboard.toJSON()).toEqual(game.toJSON());
 
-        socket.on('game', updateSpy);
-
-        waitsFor(connectionState.isConnected, 'client to connect', 1000);
-        waitsFor(function () { return updateSpy.wasCalled; }, 'socket to emit', 1000);
-
+        // Wait for data
+        waitsFor(gameDataReceived, 'game data to be received', 1000);
         runs(function () {
-            updateSpy.reset();
             mockClient.gameJSON = {};
             socket.emit('request-game');
         });
 
-        waitsFor(function () { return updateSpy.wasCalled; }, 'socket to emit', 1000);
-
+        waitsFor(gameDataReceived, 'game data to be received', 1000);
         runs(function () {
             expect(mockClient.gameJSON).toEqual(scoreboard.toJSON());
         });
-
     });
 
     // Stop the server listening
