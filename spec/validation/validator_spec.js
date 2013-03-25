@@ -66,11 +66,11 @@ describe('A Validator', function () {
 
         validation = validator.validate(validStr);
         expect(validation.valid).toBe(true);
-        expect(validation.errors.length).toBe(0);
+        expect(validation.error.errors.length).toBe(0);
 
         validation = validator.validate(invalidStr);
         expect(validation.valid).toBe(false);
-        expect(validation.errors.length).not.toBe(0);
+        expect(validation.error.errors.length).not.toBe(0);
     });
 
     it('should throw an exception if an error is added when validation is not in progress', function () {
@@ -99,7 +99,7 @@ describe('A Validator', function () {
         validation = validator.validate('ayc');
 
         expect(validation.valid).toBe(false);
-        expect(validation.errors).toEqual(expectedErrors);
+        expect(validation.error.errors).toEqual(expectedErrors);
 
         // Collection
         validator = new Validator({
@@ -114,7 +114,7 @@ describe('A Validator', function () {
         validation = validator.validate('xbz');
 
         expect(validation.valid).toBe(false);
-        expect(validation.errors).toEqual(expectedErrors);
+        expect(validation.error.errors).toEqual(expectedErrors);
     });
 
     it('should accept other Validator objects as subvalidators', function () {
@@ -136,7 +136,7 @@ describe('A Validator', function () {
         validation = finalValidator.validate(testString);
 
         expect(validation.valid).toBe(false);
-        expect(validation.errors).toEqual(expectedErrors);
+        expect(validation.error.errors).toEqual(expectedErrors);
     });
 
     it('should allow other validations to be appended', function () {
@@ -158,7 +158,7 @@ describe('A Validator', function () {
         });
 
         validation = validator.validate(testStr);
-        expect(validation.errors).toEqual(expectedErrors);
+        expect(validation.error.errors).toEqual(expectedErrors);
     });
 
     it('should only allow Validation objects to be appended', function () {
@@ -179,7 +179,7 @@ describe('A Validator', function () {
           , validation = validator.validate('ayc');
 
         expect(validation.valid).toBe(false);
-        expect(validation.errors).toEqual(expectedErrors);
+        expect(validation.error.errors).toEqual(expectedErrors);
     });
 
 });

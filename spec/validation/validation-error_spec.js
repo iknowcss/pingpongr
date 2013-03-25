@@ -35,9 +35,9 @@ describe('A ValidationError', function () {
           , emptyArray = []
           , badArrayElement = ['Normal error', {}];
 
-        expect(doConstruct()).toThrow();
+        expect(doConstruct()).not.toThrow();
         expect(doConstruct(badType)).toThrow();
-        expect(doConstruct(emptyArray)).toThrow();
+        expect(doConstruct(emptyArray)).not.toThrow();
         expect(doConstruct(badArrayElement)).toThrow();
     });
 
