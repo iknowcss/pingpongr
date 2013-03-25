@@ -16,7 +16,8 @@ describe('A ValidationError', function () {
 
         expect(doConstruct(error)).not.toThrow();
         expect(globalValidationError instanceof ValidationError).toBe(true);
-        expect(globalValidationError.getErrors()).toEqual([error]);
+        expect(globalValidationError.errors).toEqual([error]);
+        expect(globalValidationError.length).toBe(1);
     });
 
     it('may be constructed with an array of string messages', function () {
@@ -27,7 +28,8 @@ describe('A ValidationError', function () {
 
         expect(doConstruct(errors)).not.toThrow();
         expect(globalValidationError instanceof ValidationError).toBe(true);
-        expect(globalValidationError.getErrors()).toEqual(errors);
+        expect(globalValidationError.errors).toEqual(errors);
+        expect(globalValidationError.length).toBe(errors.length);
     });
 
     it('throws an exception when a bad construction argument is provided', function () {
@@ -46,18 +48,9 @@ describe('A ValidationError', function () {
           , expectedErrors = _.clone(errors)
           , validationError = ValidationError(errors);
 
-        errors[0] = 'three';
-        expect(validationError.getErrors()).toEqual(expectedErrors);
-    });
-
-    it('returns a cloned, independent errors array', function () {
-        var returnedErrors
-          , initErrors = ['one', 'two']
-          , validationError = ValidationError(initErrors);
-
-        returnedErrors = validationError.getErrors();
-        returnedErrors[0] = 'three';
-        expect(validationError.getErrors()).toEqual(initErrors);
+        errors.push('three');
+        expect(validationError.errors).toEqual(expectedErrors);
+        expect(validationError.length).toBe(expectedErrors.length);
     });
 
 });
