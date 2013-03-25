@@ -286,6 +286,100 @@ describe('A ScorekeeperRouter', function () {
         });
     });
 
+    it('emits an error when a bad state command is issued', function () {
+        waitsFor(gameDataReceived, 'game data to be received', 1000);
+        runs(function () {
+            socket.emit('command-state', 'foo');
+        });
+
+        waitsFor(errorReceived, 'error to be received', 1000);
+        runs(function () {
+            expect(mockClient.error).not.toBeUndefined();
+
+            // Ensure that game JSON wasn't emitted
+            expect(updateSpy).not.toHaveBeenCalled();
+        });
+    });
+
+    it('allows the score keeper to update the score', function () {
+        var expectedScore;
+
+        waitsFor(gameDataReceived, 'game data to be received', 1000);
+        runs(function () {
+            GameController.startGame();
+        });
+
+        waitsFor(gameDataReceived, 'game data to be received', 1000);
+        runs(function () {
+            socket.emit('command-point', 'left');
+        });
+
+        waitsFor(gameDataReceived, 'game data to be received', 1000);
+        runs(function () {
+            expectedScore = [1, 0];
+            expect(mockClient.gameJSON.score).toEqual(expectedScore);
+
+            socket.emit('command-point', 'right');
+        });
+
+        waitsFor(gameDataReceived, 'game data to be received', 1000);
+        runs(function () {
+            expectedScore = [1, 1];
+            expect(mockClient.gameJSON.score).toEqual(expectedScore);
+
+            socket.emit('command-point', 'undo');
+        });
+
+        waitsFor(gameDataReceived, 'game data to be received', 1000);
+        runs(function () {
+            expectedScore = [1, 0];
+            expect(mockClient.gameJSON.score).toEqual(expectedScore);
+
+            socket.emit('command-point', 'redo');
+        });
+
+        waitsFor(gameDataReceived, 'game data to be received', 1000);
+        runs(function () {
+            expectedScore = [1, 1];
+            expect(mockClient.gameJSON.score).toEqual(expectedScore);
+        });
+    });
+
+    it('emits an error when the score keeper attempts to update the score for a game that is not in progress', function () {
+        waitsFor(gameDataReceived, 'game data to be received', 1000);
+        runs(function () {
+            socket.emit('command-point', 'left');
+        });
+
+        waitsFor(errorReceived, 'error to be received', 1000);
+        runs(function () {
+            expect(mockClient.error).not.toBeUndefined();
+
+            // Ensure that game JSON wasn't emitted
+            expect(updateSpy).not.toHaveBeenCalled();
+        });
+    });
+
+    it('emits an error when a bad point command is issued', function () {
+        waitsFor(gameDataReceived, 'game data to be received', 1000);
+        runs(function () {
+            GameController.startGame();
+        });
+
+        waitsFor(gameDataReceived, 'game data to be received', 1000);
+        runs(function () {
+            socket.emit('command-point', 'foo');
+        });
+
+        waitsFor(errorReceived, 'error to be received', 1000);
+        runs(function () {
+            expect(mockClient.error).not.toBeUndefined();
+
+            // Ensure that game JSON wasn't emitted
+            expect(updateSpy).not.toHaveBeenCalled();
+        });
+    });
+
     // Stop the server listening
     it('closes the server', function () {
         server.close();
