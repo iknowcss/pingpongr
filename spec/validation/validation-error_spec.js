@@ -17,7 +17,6 @@ describe('A ValidationError', function () {
         expect(doConstruct(error)).not.toThrow();
         expect(globalValidationError instanceof ValidationError).toBe(true);
         expect(globalValidationError.errors).toEqual([error]);
-        expect(globalValidationError.length).toBe(1);
     });
 
     it('may be constructed with an array of string messages', function () {
@@ -29,7 +28,6 @@ describe('A ValidationError', function () {
         expect(doConstruct(errors)).not.toThrow();
         expect(globalValidationError instanceof ValidationError).toBe(true);
         expect(globalValidationError.errors).toEqual(errors);
-        expect(globalValidationError.length).toBe(errors.length);
     });
 
     it('throws an exception when a bad construction argument is provided', function () {
@@ -50,7 +48,6 @@ describe('A ValidationError', function () {
 
         errors.push('three');
         expect(validationError.errors).toEqual(expectedErrors);
-        expect(validationError.length).toBe(expectedErrors.length);
     });
 
 });
