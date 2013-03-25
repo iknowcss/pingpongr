@@ -58,11 +58,11 @@ describe('A PointCounter', function () {
 
         validation = PointCounter(wrongNumberType).validate();
         expect(validation.valid).toBe(false);
-        expect(validation.errors.length).toBe(2);
+        expect(validation.error.errors.length).toBe(2);
 
         validation = PointCounter(negativeNumber).validate();
         expect(validation.valid).toBe(false);
-        expect(validation.errors.length).toBe(2);
+        expect(validation.error.errors.length).toBe(2);
     });
 
     it('should return an independent, cloned score array', function () {

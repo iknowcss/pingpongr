@@ -77,23 +77,23 @@ describe('A PlayerSet', function () {
 
         validation = longLeftPlayer.validate();
         expect(validation.valid).toBe(false);
-        expect(validation.errors.length).toBe(1);
+        expect(validation.error.errors.length).toBe(1);
 
         validation = longRightPlayer.validate();
         expect(validation.valid).toBe(false);
-        expect(validation.errors.length).toBe(1);
+        expect(validation.error.errors.length).toBe(1);
 
         validation = shortLeftPlayer.validate();
         expect(validation.valid).toBe(false);
-        expect(validation.errors.length).toBe(1);
+        expect(validation.error.errors.length).toBe(1);
 
         validation = shortRightPlayer.validate();
         expect(validation.valid).toBe(false);
-        expect(validation.errors.length).toBe(1);
+        expect(validation.error.errors.length).toBe(1);
 
         validation = bothWrong.validate();
         expect(validation.valid).toBe(false);
-        expect(validation.errors.length).toBe(2);
+        expect(validation.error.errors.length).toBe(2);
     });
 
     it('should generate an up-to-date JSON', function () {

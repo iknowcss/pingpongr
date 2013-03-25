@@ -69,15 +69,15 @@ describe('A Game', function () {
 
         validation = Game(invalidPlayerSet).validate();
         expect(validation.valid).toBe(false);
-        expect(validation.errors.length).toBe(1);
+        expect(validation.error.errors.length).toBe(1);
 
         validation = Game(invalidPointCounter).validate();
         expect(validation.valid).toBe(false);
-        expect(validation.errors.length).toBe(1);
+        expect(validation.error.errors.length).toBe(1);
 
         validation = Game(bothInvalid).validate();
         expect(validation.valid).toBe(false);
-        expect(validation.errors.length).toBe(2);
+        expect(validation.error.errors.length).toBe(2);
     });
 
     it('should notify observers of change in state or points', function () {
