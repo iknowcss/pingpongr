@@ -159,9 +159,7 @@ describe('A ScoreboardRouter', function () {
     it('closes the server', function () {
         runs(function () {
             io.connect(null, {'force new connection': true});
-            try {
-                server.close();
-            } catch (e) {}
+            server.close();
         });
         waitsFor(function () {
             return !socket.socket.connected;

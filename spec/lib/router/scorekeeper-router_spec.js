@@ -79,7 +79,7 @@ describe('A ScorekeeperRouter', function () {
         if (!server) {
             return;
         }
-        
+
         runs(function () {
             // Put everything into a clean initial state
             GameController.newGame();
@@ -391,9 +391,7 @@ describe('A ScorekeeperRouter', function () {
     it('closes the server', function () {
         runs(function () {
             io.connect(null, {'force new connection': true});
-            try {
-                server.close();
-            } catch (e) {}
+            server.close();
         });
         waitsFor(function () {
             return !socket.socket.connected;
