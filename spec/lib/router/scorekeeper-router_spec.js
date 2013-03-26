@@ -15,6 +15,7 @@ var ScorekeeperRouter = require('../../../lib/router/scorekeeper-router')
         'log': false
     }
 
+  , server
   , scoreboard = GameController.getScoreboard()
   , port = 8888
   , namespace = '/scorekeeper'
@@ -34,13 +35,6 @@ connectionState = new function () {
         return connected;
     };
 };
-
-// Prepare the server and attach the ScorekeeperRouter
-server = require('http').createServer();
-ScorekeeperRouter.listen(server, ioRouterOptions);
-
-// Start the server listening
-server.listen(port);
 
 describe('A ScorekeeperRouter', function () {
     
@@ -82,6 +76,10 @@ describe('A ScorekeeperRouter', function () {
 
     // Before each, open the client socket
     beforeEach(function () {
+        if (!server) {
+            return;
+        }
+        
         runs(function () {
             // Put everything into a clean initial state
             GameController.newGame();
@@ -109,6 +107,15 @@ describe('A ScorekeeperRouter', function () {
         if (socket && socket.socket.connected) {
             socket.disconnect();
         }
+    });
+
+    it('opens the server', function () {
+        // Prepare the server and attach the ScorekeeperRouter
+        server = require('http').createServer();
+        ScorekeeperRouter.listen(server, ioRouterOptions);
+
+        // Start the server listening
+        server.listen(port);
     });
 
     it('emits the current game JSON on connection', function () {
@@ -382,7 +389,15 @@ describe('A ScorekeeperRouter', function () {
 
     // Stop the server listening
     it('closes the server', function () {
-        server.close();
+        runs(function () {
+            io.connect(null, {'force new connection': true});
+            try {
+                server.close();
+            } catch (e) {}
+        });
+        waitsFor(function () {
+            return !socket.socket.connected;
+        });
     });
 
 });
