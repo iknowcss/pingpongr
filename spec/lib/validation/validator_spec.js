@@ -1,4 +1,4 @@
-var Validator = require('../../lib/validation/validator'),
+var Validator = require('../../../lib/validation/validator'),
     _ = require('underscore');
 
 describe('A Validator', function () {

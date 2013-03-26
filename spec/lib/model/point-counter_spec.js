@@ -1,5 +1,5 @@
-var PointCounter = require('../../lib/model/point-counter')
-  , PlayerSet = require('../../lib/model/player-set')
+var PointCounter = require('../../../lib/model/point-counter')
+  , PlayerSet = require('../../../lib/model/player-set')
   , _ = require('underscore');
 
 describe('A PointCounter', function () {

@@ -1,7 +1,7 @@
-var Game = require('../../lib/model/game')
-  , GameState = require('../../lib/model/game-state')
-  , PlayerSet = require('../../lib/model/player-set')
-  , PointCounter = require('../../lib/model/point-counter')
+var Game = require('../../../lib/model/game')
+  , GameState = require('../../../lib/model/game-state')
+  , PlayerSet = require('../../../lib/model/player-set')
+  , PointCounter = require('../../../lib/model/point-counter')
   , _ = require('underscore');
 
 describe('A Game', function () {

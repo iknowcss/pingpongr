@@ -1,4 +1,4 @@
-var Observable = require('../../lib/model/observable-mixin.js'),
+var Observable = require('../../../lib/model/observable-mixin.js'),
     _ = require('underscore');
 
 describe('The Observable mixin', function () {

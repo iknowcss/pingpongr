@@ -1,4 +1,4 @@
-var ValidationError = require('../../lib/validation/validation-error');
+var ValidationError = require('../../../lib/validation/validation-error');
 
 
 describe('A ValidationError', function () {

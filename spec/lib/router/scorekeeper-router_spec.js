@@ -1,7 +1,7 @@
-var ScorekeeperRouter = require('../../lib/router/scorekeeper-router')
-  , GameController = require('../../lib/controller/game-controller')
-  , GameState = require('../../lib/model/game-state')
-  , Game = require('../../lib/model/game')
+var ScorekeeperRouter = require('../../../lib/router/scorekeeper-router')
+  , GameController = require('../../../lib/controller/game-controller')
+  , GameState = require('../../../lib/model/game-state')
+  , Game = require('../../../lib/model/game')
   , _ = require('underscore')
   , io = require('socket.io-client')
 
