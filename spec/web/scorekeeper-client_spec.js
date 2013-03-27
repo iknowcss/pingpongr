@@ -1,10 +1,18 @@
 var jsdom = require('jsdom').jsdom
   , resource = require('../resource')
   , window
-  , $
+  , io
   , ScorekeeperClient;
 
 describe('A ScorekeeperClient', function () {
+
+    var globalClient;
+
+    function doConstruct (options) {
+        return function () {
+            globalClient = ScorekeeperClient(options);
+        };
+    }
 
     beforeEach(function (done) {
         // If the DOM is already loaded, don't load it again
@@ -17,21 +25,23 @@ describe('A ScorekeeperClient', function () {
         jsdom.env({
             html: '<html><head></head><body></body></html>',
             scripts: [
-                resource.jquery(),
+                resource.io(),
                 resource.js('scorekeeper-client.js'),
             ],
             done: function (errors, _window) {
                 window = _window;
-                $ = window.$;
+                io = window.io;
                 ScorekeeperClient = window.ScorekeeperClient;
                 done();
             }
         });
     });
 
-    it('constructs a client object with defaults', function () {
-        var client = ScorekeeperClient();
-        expect(client instanceof ScorekeeperClient).toBe(true);
+    it('constructs a client object with defaults that connects', function () {
+        expect(doConstruct()).not.toThrow();
+        expect(globalClient instanceof ScorekeeperClient).toBe(true);
+
+        globalClient.connect();
     });
     
 });

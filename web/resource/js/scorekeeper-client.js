@@ -10,6 +10,10 @@
 
         }
 
+        this.connect = function () {
+            
+        };
+
         init.call(this, options);
 
     };

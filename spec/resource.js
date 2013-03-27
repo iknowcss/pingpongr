@@ -1,9 +1,8 @@
 var root = __dirname.substr(0, __dirname.lastIndexOf('/'))
   , resource = {}
   , paths = {
-        js      : '/web/resource/js',
-        vendor  : '/web/resource/js/vendor',
-        jquery  : '/web/resource/js/vendor/jquery.js'
+        io  : '/node_modules/socket.io-client/dist/socket.io.js',
+        js  : '/web/resource/js'
     };
 
 function cleanfile (s) {
