@@ -1,6 +1,8 @@
 var jsdom = require('jsdom').jsdom
+  , resource = require('../resource')
   , window
-  , $;
+  , $
+  , ScorekeeperClient;
 
 describe('A ScorekeeperClient', function () {
 
@@ -15,18 +17,21 @@ describe('A ScorekeeperClient', function () {
         jsdom.env({
             html: '<html><head></head><body></body></html>',
             scripts: [
-                '../../web/resource/js/vendor/jquery.js'
+                resource.jquery(),
+                resource.js('scorekeeper-client.js'),
             ],
             done: function (errors, _window) {
                 window = _window;
                 $ = window.$;
+                ScorekeeperClient = window.ScorekeeperClient;
                 done();
             }
         });
     });
 
-    xit('', function () {
-
+    it('constructs a client object with defaults', function () {
+        var client = ScorekeeperClient();
+        expect(client instanceof ScorekeeperClient).toBe(true);
     });
     
 });
