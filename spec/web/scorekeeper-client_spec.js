@@ -4,7 +4,9 @@ var jsdom = require('jsdom').jsdom
 
   , server
   , port = 8888
+  , namespace = '/scorekeeper'
   , mockRouter
+  , mockNamespace
   , routerOptions = {
         'close timeout': 0.2,
         'client store expiration': 0.2,
@@ -26,10 +28,23 @@ describe('A ScorekeeperClient', function () {
         return function () {
             options = _.extend({}, options, {
                 port: port,
+                namespace: namespace,
                 ioOptions: clientOptions
             });
             globalClient = ScorekeeperClient(options);
         };
+    }
+
+    function handleConnection (socket) {
+        console.log('client connected');
+        socket.on('request-game', handleEmit);
+        socket.on('command-create', handleEmit);
+        socket.on('command-state', handleEmit);
+        socket.on('command-point', handleEmit);
+    }
+
+    function handleEmit (data) {
+        console.log(data);
     }
 
     beforeEach(function () {
@@ -63,6 +78,9 @@ describe('A ScorekeeperClient', function () {
         // Prepare the server and attach the mockRouter
         server = require('http').createServer();
         mockRouter = require('socket.io').listen(server, routerOptions);
+        mockRouter
+            .of(mockNamespace)
+            .on('connection', handleConnection);
 
         // Start the server listening
         server.listen(port);

@@ -14,7 +14,8 @@
 
     ScorekeeperClient = function (options) {
 
-        var socket
+        var self = this
+          , socket
           , connectionString
           , ioOptions;
 
@@ -31,9 +32,15 @@
         };
 
         function initSocketBindings () {
-            // socket.on('connect', connectionState.connected);
+            socket.on('connect', handleConnection);
+            console.log(socket)
             // socket.on('game', updateSpy);
             // socket.on('error', errorSpy);
+        }
+
+        function handleConnection () {
+            console.log('connected')
+            self.connected = true;
         }
 
         init.call(this, options);
