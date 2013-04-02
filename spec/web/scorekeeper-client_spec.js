@@ -1,28 +1,27 @@
-var jsdom = require('jsdom').jsdom
-  , resource = require('../resource')
+var ScorekeeperClient = require('../../web/resource/js/scorekeeper-client')
+  , Game = require('../../lib/model/game')
   , _ = require('underscore')
 
-  , server
-  , port = 8888
-  , namespace = '/scorekeeper'
-  , mockRouter
-  , mockNamespace
   , routerOptions = {
         'close timeout': 0.2,
         'client store expiration': 0.2,
         'log': false
     }
-
-  , window
-  , ScorekeeperClient
   , clientOptions = {
         'reconnect': false,
         'force new connection': true
-    };
+    }
+
+  , server
+  , port = 8888
+  , namespace = '/scorekeeper'
+  , mockRouter
+  , mockNamespace;
 
 describe('A ScorekeeperClient', function () {
 
-    var globalClient;
+    var skClient
+      , updateSpy;
 
     function doConstruct (options) {
         return function () {
@@ -31,12 +30,13 @@ describe('A ScorekeeperClient', function () {
                 namespace: namespace,
                 ioOptions: clientOptions
             });
-            globalClient = ScorekeeperClient(options);
+            skClient = ScorekeeperClient(options);
+            updateSpy = jasmine.createSpy();
+            skClient.observe(updateSpy);
         };
     }
 
     function handleConnection (socket) {
-        console.log('client connected');
         socket.on('request-game', handleEmit);
         socket.on('command-create', handleEmit);
         socket.on('command-state', handleEmit);
@@ -47,39 +47,12 @@ describe('A ScorekeeperClient', function () {
         console.log(data);
     }
 
-    beforeEach(function () {
-        var envOptions;
-
-        if (!window) { 
-            envOptions = {
-                html: '<html><head></head><body></body></html>',
-                scripts: [
-                    resource.io(),
-                    resource.underscore(),
-                    resource.js('scorekeeper-client.js'),
-                ],
-                done: function (errors, _window) {
-                    window = _window;
-                    window.console = console
-                    ScorekeeperClient = window.ScorekeeperClient;
-                }
-            };
-
-            runs(function () {
-                jsdom.env(envOptions);
-            });
-            waitsFor(function () {
-                return !!window;
-            });
-        }
-    });
-
     it('opens the server', function () {
         // Prepare the server and attach the mockRouter
         server = require('http').createServer();
         mockRouter = require('socket.io').listen(server, routerOptions);
-        mockRouter
-            .of(mockNamespace)
+        mockNamespace = mockRouter
+            .of(namespace)
             .on('connection', handleConnection);
 
         // Start the server listening
@@ -89,24 +62,37 @@ describe('A ScorekeeperClient', function () {
     it('constructs a client object that connects', function () {
         runs(function () {
             expect(doConstruct()).not.toThrow();
-            expect(globalClient instanceof ScorekeeperClient).toBe(true);
+            expect(skClient instanceof ScorekeeperClient).toBe(true);
 
-            globalClient.connect();
+            skClient.connect();
         });
         waitsFor(function () {
-            return globalClient.connected;
+            return skClient.isConnected();
+        });
+    });
+
+    it('receives gameJSONs and notifies observers', function () {
+        var testGameJSON = Game().toJSON();
+        runs(function () {
+            updateSpy.reset();
+            mockNamespace.emit('game', testGameJSON);
+        });
+        waitsFor(function () {
+            return updateSpy.wasCalled;
+        });
+        runs(function () {
+            expect(updateSpy).toHaveBeenCalledWith(testGameJSON);
         });
     });
 
     it('closes the server', function () {
         runs(function () {
             // Connect the client to null to disconnect it from the server
-            //io.connect(null, {'force new connection': true});
+            skClient.disconnect();
             server.close();
         });
         waitsFor(function () {
-            return true;
-            //return !socket.socket.connected;
+            return !skClient.isConnected();
         });
     });
     
