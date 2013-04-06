@@ -33,7 +33,6 @@ describe('A ScorekeeperClient', function () {
         return function () {
             options = _.extend({}, options, {
                 port: port,
-                namespace: namespace,
                 ioOptions: clientOptions
             });
             skClient = ScorekeeperClient(options);
