@@ -8,9 +8,9 @@
 
       , socket
       , defaults = {
-            port: 80,
-            host: ':',
-            namespace: '/scorekeeper'
+            port        : 80,
+            host        : ':',
+            namespace   : '/scorekeeper'
         };
 
     ScorekeeperClient = function (options) {
@@ -22,12 +22,28 @@
           , connectionString
           , ioOptions;
 
+        _.extend(this, Observable);
+
         function init (options) {
             options = _.extend({}, defaults, options);
             connectionString = options.host + options.port + options.namespace;
             ioOptions = options.ioOptions;
         }
 
+        function initSocketBindings () {
+            socket.on('game', handleGame);
+            socket.on('error', handleError);
+        }
+
+        function handleGame (data) {
+            self.notify('game', data);
+        }
+
+        function handleError (data) {
+            self.notify('error', data);
+        }
+
+        // Connection management
         this.isConnected = function () {
             if (!socket) {
                 return false;
@@ -48,17 +64,48 @@
             socket.disconnect();
         };
 
-        function initSocketBindings () {
-            socket.on('game', handleGame);
+        function socketEmit (command, data) {
+            if (!self.isConnected()) {
+                handleError({
+                    type: 'exception',
+                    message: 'client is not connected'
+                });
+            } else {
+                socket.emit(command, data);
+            }
         }
 
-        function handleGame (data) {
-            self.notify(data);
-        }
+        function doSocketEmit (command, data) {
+            return function () {
+                socketEmit(command, data);
+            };
+        };
+
+        // request-game
+        this.refreshGame = function () {
+            socketEmit('request-game');
+        };
+
+        // command-create
+        this.createGame = function (gameJSON) {
+            if (_.isUndefined(gameJSON)) {
+                gameJSON = {};
+            }
+            socketEmit('command-create', gameJSON);
+        };
+
+        // command-state
+        this.startGame = doSocketEmit('command-state', 'start');
+        this.endGame = doSocketEmit('command-state', 'end');
+        this.cancelGame = doSocketEmit('command-state', 'cancel');
+
+        // command-point
+        this.pointLeft = doSocketEmit('command-point', 'left');
+        this.pointRight = doSocketEmit('command-point', 'right');
+        this.undoPoint = doSocketEmit('command-point', 'undo');
+        this.redoPoint = doSocketEmit('command-point', 'redo');
 
         init.call(this, options);
-
-        _.extend(this, Observable);
 
     };
 
