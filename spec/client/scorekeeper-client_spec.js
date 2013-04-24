@@ -1,4 +1,4 @@
-var ScorekeeperClient = require('../../web/resource/js/scorekeeper-client')
+var ScorekeeperClient = require('../../public/javascripts/scorekeeper-client')
   , Game = require('../../lib/model/game')
   , _ = require('underscore')
 

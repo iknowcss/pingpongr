@@ -1,4 +1,4 @@
-var ScoreboardClient = require('../../web/resource/js/scoreboard-client')
+var ScoreboardClient = require('../../public/javascripts/scoreboard-client')
   , Game = require('../../lib/model/game')
   , _ = require('underscore')
 
