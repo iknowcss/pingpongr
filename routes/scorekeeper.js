@@ -10,13 +10,13 @@ exports.index = function (req, res) {
   if (tableId !== 1) {
     res.send(404);
   } else {
-    data = buildScoreboardData(GameController);
-    res.render('scoreboard', data);
+    data = buildScorekeeperData(GameController);
+    res.render('scorekeeper', data);
   }
 
 };
 
-function buildScoreboardData (gameController) {
+function buildScorekeeperData (gameController) {
   var data = {
     title: gameController.getTableName()
   };

@@ -1,11 +1,23 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
-        <title><%= title %></title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>PingPongr</title>
         <link rel="stylesheet" href="/stylesheets/style.css" />
     </head>
     <body>
-        <h1><%= title %></h1>
-        <p>Welcome to <%= title %></p>
+        <h1>PingPongr</h1>
+
+        <h2>Available Tables</h2>
+        <ul class="table-list">
+        <%  var table, i;
+            for (i = 0; i < tables.length; i++) { 
+                table = tables[i]; 
+        %>
+            <li><a href="/scoreboard/<%= table.id %>/">
+                <%= table.room %> - <%= table.name %>
+            </a></li>
+        <% } %>
+        </ul>
     </body>
 </html>

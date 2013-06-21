@@ -1,8 +1,21 @@
+var game;
 
-/*
- * GET home page.
- */
+function getTables () {
+    return [
+        { id    : 1
+        , room  : 'Clean Room'
+        , name  : 'Light blue' }
+    ]
+}
 
-exports.index = function(req, res){
-    res.render('index', { title: 'Express' });
+exports.index = function (req, res) {
+
+    var model;
+
+    model = {
+        tables: getTables()
+    };
+
+    res.render('index', model);
+
 };

@@ -9,7 +9,7 @@
     <script type="text/javascript" src="/vendor/socket.io/socket.io.js"></script>
 
     <script type="text/javascript" src="/lib/model/observable-mixin.js"></script>
-    <script type="text/javascript" src="/public/javascripts/scoreboard-client.js"></script>
+    <script type="text/javascript" src="/public/javascripts/scorekeeper-client.js"></script>
 
     <script type="text/javascript">
       $(function () {
@@ -18,18 +18,30 @@
               port: 3000
             };
         
-        window.client = ScoreboardClient(options);
+        window.client = ScorekeeperClient(options);
 
         client.observe(function (message, data) {
-          console.log(data);
+          $("#output").prepend(
+            $("<li>").text( JSON.stringify(data) ) );
         });
 
         client.connect();
 
       });
     </script>
+
+    <style type="text/css">
+      #output li {
+        color: #aaa;
+      }
+      #output li:first-child {
+        color: black;
+      }
+    </style>
+
   </head>
   <body>
     <h1><%= title %></h1>
+    <ul id="output"></ul>
   </body>
 </html>
