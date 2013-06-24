@@ -14,15 +14,89 @@
     <script type="text/javascript">
       $(function () {
 
-        var options = {
-              port: 3000
+        var options = { port: 3000 }
+          , client
+          , display = {
+              player  : {
+                left    : $('#player .left'),
+                right   : $('#player .right')
+              },
+              state   : $('#state'),
+              score   : {
+                left    : $('#score .left'),
+                right   : $('#score .right')
+              },
+              bottomContainer : $('#bottom-container')
+            }
+          , control = {
+              table   : $('#control-table'),
+              point     : {
+                left  : $('#control-table .point-control .left'),
+                right : $('#control-table .point-control .right'),
+                undo  : $('#control-table .undo-redo-control .undo'),
+                redo  : $('#control-table .undo-redo-control .redo')
+              },
+              gameState : {
+                restart  : $('#control-table .game-state-control .restart')
+              },
+              showHideToggle  : $("#bottom-container .show-hide-toggle")
             };
         
-        window.client = ScorekeeperClient(options);
+        client = window.client = ScorekeeperClient(options);
 
+        // Wire controls
+        control.point.left.bind('click', client.pointLeft);
+        control.point.right.bind('click', client.pointRight);
+        control.point.undo.bind('click', client.undoPoint);
+        control.point.redo.bind('click', client.redoPoint);
+        control.gameState.restart.bind('click', function () {
+          client.createGame();
+          client.startGame();
+        });
+        control.showHideToggle.bind('click', function () {
+          if (control.table.hidden) {
+            control.table.show();
+            control.table.hidden = false;
+            $(this).text('v v v hide v v v');
+          } else {
+            control.table.hide();
+            control.table.hidden = true;
+            $(this).text('^ ^ ^ show ^ ^ ^');
+          }
+        });
+
+        // Wire display
+        /**
+        {
+          "state"   : "ended",
+          "score"   : [0,0],
+          "players" : [
+            "Player 1",
+            "Player 2"
+          ]
+        }
+          */
         client.observe(function (message, data) {
-          $("#output").prepend(
-            $("<li>").text( JSON.stringify(data) ) );
+          // Update state
+          display.state.text(data.state);
+
+          // Update players
+          display.player.left
+            .text(data.players[0]);
+          display.player.right
+            .text(data.players[1]);
+
+          // Update score
+          display.score.left.text(data.score[0]);
+          display.score.right.text(data.score[1]);
+
+          // Update controls
+          if (data.state === 'ready') {
+            
+          } else if (data.state === 'ended' || data.state === 'in-progress') {
+            
+          }
+
         });
 
         client.connect();
@@ -31,17 +105,140 @@
     </script>
 
     <style type="text/css">
-      #output li {
-        color: #aaa;
+      table {
+        border-collapse: collapse;
       }
-      #output li:first-child {
-        color: black;
+
+      table td, 
+      table th {
+        padding: 0;
       }
+
+      #scoreboard {
+        width: 100%;
+        min-width: 400px;
+      }
+
+      #scoreboard td {
+        text-align: center;
+        width: 50%;
+      }
+
+      #player td {
+        font-size: 30pt;
+        padding: 0.5em 0;
+      }
+
+      #score td {
+        font-size: 120pt;
+      }
+
+      #state:first-letter {
+        text-transform: uppercase;
+      }
+
+      #bottom-container {
+        padding: 1em 0 0 0;
+        width: 100%;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+      }
+
+      #bottom-container .show-hide-toggle {
+        margin: 0;
+        display: block;
+        width: 100%;
+      }
+
+      #control-table {
+        width: 100%;
+      }
+
+      #control-table button {
+        font-size: 10pt;
+      }
+
+      #control-table td {
+        width: 33.33%;
+        text-align: center;
+      }
+
+      #control-table td button {
+        width: 100%;
+        display: block;
+        font-size: 30pt;
+        margin: 0;
+        height: 2em;
+        background-color: #eef0f0;
+      }
+
+      /*@media handheld {*/
+        #control-table td button {
+          height: 4em;
+        }
+      /*}*/
+
+      #control-table .point-control {
+        
+      }
+
+      #control-table .undo-redo-control {
+        
+      }
+
+      #control-table .game-state-control {
+
+      }
+
     </style>
 
   </head>
   <body>
-    <h1><%= title %></h1>
-    <ul id="output"></ul>
+
+    <div id="state"></div>
+
+    <table id="scoreboard"><tbody>
+
+      <tr id="player">
+        <td class="left"></td>
+        <td class="right"></td>
+      </tr>
+
+      <tr id="score">
+        <td class="left"></td>
+        <td class="right"></td>
+      </tr>
+
+    </tbody></table>
+
+    <div id="bottom-container">
+
+      <button class="show-hide-toggle">v v v hide v v v</button>
+
+      <table id="control-table"><tbody>
+
+        <tr class="point-control">
+          <td><button class="left">&#9668; Point</button></td>
+          <td><button class="right">Point &#9658;</button></td>
+        </tr>
+
+        <tr class="undo-redo-control">
+          <td><button class="undo">Undo</button></td>
+          <td><button class="redo">Redo</button></td>
+        </tr>
+          
+        <tr>
+          <td class="game-state-control" colspan="2">
+            <button class="restart">Restart game</button>
+          </td>
+        </tr>
+
+        </tr>
+
+      </tbody></table>
+
+    </div>
+
   </body>
 </html>
