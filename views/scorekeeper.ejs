@@ -14,7 +14,8 @@
     <script type="text/javascript">
       $(function () {
 
-        var options = { port: 3000 }
+        var urlMatches
+          , options
           , client
           , display = {
               player  : {
@@ -42,6 +43,24 @@
               showHideToggle  : $("#bottom-container .show-hide-toggle")
             };
         
+        urlMatches = window.location.href
+          .match(/^([^:]+):\/\/[^\/:]+(?::(\d+))?/);
+
+        options = {};
+        if (urlMatches[2] !== undefined) {
+          options.port = parseInt(urlMatches[2]);
+        } else {
+          switch (urlMatches[1].toLowerCase()) {
+            case 'http':
+              options.port = 80;
+              break;
+            case 'https':
+              options.port = 443;
+              break;
+          }
+        }
+
+
         client = window.client = ScorekeeperClient(options);
 
         // Wire controls
