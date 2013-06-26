@@ -8,10 +8,10 @@
 
     , socket
     , defaults = {
-      port      : 80,
-      host      : ':',
-      namespace : '/scoreboard'
-    };
+        port      : 80,
+        host      : ':',
+        namespace : '/scoreboard'
+      };
 
   ScoreboardClient = function (options) {
 
@@ -26,7 +26,7 @@
 
     function init (options) {
       options = _.extend({}, defaults, options);
-      connectionString = options.host + options.port + options.namespace;
+      connectionString = /*options.host + options.port + */options.namespace;
       ioOptions = options.ioOptions;
     }
 
