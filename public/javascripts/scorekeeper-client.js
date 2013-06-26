@@ -8,10 +8,10 @@
 
     , socket
     , defaults = {
-      port    : 80,
-      host    : ':',
-      namespace   : '/scorekeeper'
-    };
+        port      : 80,
+        host      : ':',
+        namespace : '/scorekeeper'
+      };
 
   ScorekeeperClient = function (options) {
 

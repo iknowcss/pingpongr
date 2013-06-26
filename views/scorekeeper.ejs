@@ -14,56 +14,36 @@
     <script type="text/javascript">
       $(function () {
 
-        var urlMatches
-          , options
+        var options
           , client
-          , display = {
-              player  : {
-                left    : $('#player .left'),
-                right   : $('#player .right')
-              },
-              state   : $('#state'),
-              score   : {
-                left    : $('#score .left'),
-                right   : $('#score .right')
-              },
-              bottomContainer : $('#bottom-container')
-            }
-          , control = {
-              table   : $('#control-table'),
-              point     : {
-                left  : $('#control-table .point-control .left'),
-                right : $('#control-table .point-control .right'),
-                undo  : $('#control-table .undo-redo-control .undo'),
-                redo  : $('#control-table .undo-redo-control .redo')
-              },
-              gameState : {
-                restart  : $('#control-table .game-state-control .restart')
-              },
-              showHideToggle  : $("#bottom-container .show-hide-toggle")
-            };
-        
-        urlMatches = window.location.href
-          .match(/^([^:]+):\/\/[^\/:]+(?::(\d+))?/);
+          , display
+          , control;
 
-        options = {};
-        if (urlMatches[2] !== undefined) {
-          options.port = parseInt(urlMatches[2]);
-        } else {
-          switch (urlMatches[1].toLowerCase()) {
-            case 'http':
-              options.port = 80;
-              break;
-            case 'https':
-              options.port = 443;
-              break;
+        // Prepare the socket client
+        options = {
+          ioOptions: {
+             // Necessary for AppFog as WebSockets are not supported (for now)
+            'transports': ['xhr-polling']
           }
-        }
-
-
+        };
         client = window.client = ScorekeeperClient(options);
 
-        // Wire controls
+        // Reference interactive controlls
+        control = {
+          table   : $('#control-table'),
+          point   : {
+            left  : $('#control-table .point-control .left'),
+            right : $('#control-table .point-control .right'),
+            undo  : $('#control-table .undo-redo-control .undo'),
+            redo  : $('#control-table .undo-redo-control .redo')
+          },
+          gameState : {
+            restart  : $('#control-table .game-state-control .restart')
+          },
+          showHideToggle  : $("#bottom-container .show-hide-toggle")
+        };
+
+        // Wire interactive controls
         control.point.left.bind('click', client.pointLeft);
         control.point.right.bind('click', client.pointRight);
         control.point.undo.bind('click', client.undoPoint);
@@ -84,40 +64,63 @@
           }
         });
 
-        // Wire display
-        /**
-        {
-          "state"   : "ended",
-          "score"   : [0,0],
-          "players" : [
-            "Player 1",
-            "Player 2"
-          ]
+        // Hide the controls if specified
+        if (window.location.search.substr(1) == 'hide-controls') {
+          control.table.hidden = false;
+          control.showHideToggle.trigger('click');
         }
-          */
+
+        // Reference display controls
+        display = {
+          player  : {
+            left    : $('#player .left'),
+            right   : $('#player .right')
+          },
+          state   : $('#state'),
+          score   : {
+            left    : $('#score .left'),
+            right   : $('#score .right')
+          },
+          bottomContainer : $('#bottom-container')
+        };
+
+        // Wire display
         client.observe(function (message, data) {
-          // Update state
-          display.state.text(data.state);
+          var sensitiveControls = $()
+                .add(control.point.left)
+                .add(control.point.right)
+                .add(control.point.undo)
+                .add(control.point.redo);
 
-          // Update players
-          display.player.left
-            .text(data.players[0]);
-          display.player.right
-            .text(data.players[1]);
+          if (message == 'game') {
 
-          // Update score
-          display.score.left.text(data.score[0]);
-          display.score.right.text(data.score[1]);
+            // Update state
+            display.state.text(data.state);
 
-          // Update controls
-          if (data.state === 'ready') {
-            
-          } else if (data.state === 'ended' || data.state === 'in-progress') {
-            
+            // Update players
+            display.player.left.text(data.players[0]);
+            display.player.right.text(data.players[1]);
+
+            // Update score
+            display.score.left.text(data.score[0]);
+            display.score.right.text(data.score[1]);
+
+
+            // Update controls
+            if (data.state === 'in-progress') {
+              sensitiveControls.removeAttr('disabled');
+            } else if (data.state === 'ended' || data.state === 'ready') {
+              sensitiveControls.attr('disabled', 'disabled');
+            }
+
+          } else {
+            alert(message);
+            console.log(data);
           }
 
         });
 
+        // Connect the client
         client.connect();
 
       });
@@ -144,12 +147,12 @@
       }
 
       #player td {
-        font-size: 30pt;
+        font-size: 50pt;
         padding: 0.5em 0;
       }
 
       #score td {
-        font-size: 120pt;
+        font-size: 200pt;
       }
 
       #state:first-letter {
@@ -215,7 +218,7 @@
   </head>
   <body>
 
-    <div id="state"></div>
+    <!--<div id="state"></div>-->
 
     <table id="scoreboard"><tbody>
 
@@ -249,7 +252,7 @@
           
         <tr>
           <td class="game-state-control" colspan="2">
-            <button class="restart">Restart game</button>
+            <button class="restart">New game</button>
           </td>
         </tr>
 
