@@ -3,14 +3,14 @@ var ScorekeeperClient = require('../../public/javascripts/scorekeeper-client')
   , _ = require('underscore')
 
   , routerOptions = {
-    'close timeout': 0.2,
-    'client store expiration': 0.2,
-    'log': false
-  }
+      'close timeout': 0.2,
+      'client store expiration': 0.2,
+      'log': false
+    }
   , clientOptions = {
-    'reconnect': false,
-    'force new connection': true
-  }
+      'reconnect': false,
+      'force new connection': true
+    }
 
   , server
   , port = 8888

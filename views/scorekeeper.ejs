@@ -4,44 +4,24 @@
     <title><%= title %></title>
     <link rel="stylesheet" href="/public/stylesheets/style.css"/>
 
+    <!-- Vendor -->
     <script type="text/javascript" src="/vendor/jquery/jquery.js"></script>
     <script type="text/javascript" src="/vendor/underscore/underscore.js"></script>
     <script type="text/javascript" src="/vendor/socket.io/socket.io.js"></script>
 
-    <script type="text/javascript" src="/lib/model/observable-mixin.js"></script>
+    <!-- Util -->
+    <script type="text/javascript" src="/lib/mixin/observable-mixin.js"></script>
+
+    <!-- Page -->
     <script type="text/javascript" src="/public/javascripts/scorekeeper-client.js"></script>
-
-    <script type="text/javascript">
-      $(function () {
-
-        var options = {
-              port: 3000
-            };
-        
-        window.client = ScorekeeperClient(options);
-
-        client.observe(function (message, data) {
-          $("#output").prepend(
-            $("<li>").text( JSON.stringify(data) ) );
-        });
-
-        client.connect();
-
-      });
-    </script>
-
-    <style type="text/css">
-      #output li {
-        color: #aaa;
-      }
-      #output li:first-child {
-        color: black;
-      }
-    </style>
+    <script type="text/javascript" src="/public/javascripts/scorekeeper-page.js"></script>
 
   </head>
   <body>
+
     <h1><%= title %></h1>
+
     <ul id="output"></ul>
+    
   </body>
 </html>

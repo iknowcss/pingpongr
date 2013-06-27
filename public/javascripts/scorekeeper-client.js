@@ -1,6 +1,7 @@
 (function () {
 
   var root = this
+
     , isNode = (typeof exports !== 'undefined')
     , initExport
 
@@ -134,4 +135,4 @@
     root.Observable = require('../../lib/mixin/observable-mixin');
   }
 
-}).call(this);
+}());
