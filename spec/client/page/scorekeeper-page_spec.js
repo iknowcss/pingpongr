@@ -41,7 +41,7 @@ describe('The Scorekeeper Page', function () {
   it('has HTML', function () {
     loadDOM();
     runs(function () {
-      console.log($); // Woohoo!
+      // console.log($); // Woohoo!
     });
   });
 
