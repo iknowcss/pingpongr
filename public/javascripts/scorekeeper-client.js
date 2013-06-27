@@ -131,7 +131,7 @@
   if (isNode) {
     root._ = require('underscore');
     root.io = require('socket.io-client');
-    root.Observable = require('../../lib/model/observable-mixin');
+    root.Observable = require('../../lib/mixin/observable-mixin');
   }
 
 }).call(this);
